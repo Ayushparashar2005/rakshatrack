@@ -1,0 +1,156 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  /* ── Surfaces (light, elevation by lightness) ─────────────────── */
+  --color-surface-base:     oklch(0.97 0.01 250);    /* background */
+  --color-surface-raised:   oklch(0.99 0.005 250);   /* cards */
+  --color-surface-overlay:  oklch(1 0 0);            /* panels, side panels */
+  --color-surface-float:    oklch(1 0 0);            /* modals, dropdowns */
+  --color-sidebar:          oklch(0.95 0.01 250);    /* sidebar */
+
+  /* ── Accent ramp (emerald) ───────────────────────────────────── */
+  --color-accent-50:  oklch(0.97 0.048 155);
+  --color-accent-200: oklch(0.88 0.100 155);
+  --color-accent-400: oklch(0.74 0.172 155);
+  --color-accent-500: oklch(0.65 0.195 155);  /* primary accent */
+  --color-accent-600: oklch(0.57 0.185 155);  /* hover */
+  --color-accent-900: oklch(0.28 0.072 155);  /* glow bg */
+
+  /* ── Semantic status ─────────────────────────────────────────── */
+  --color-flagged:   oklch(0.72 0.18 55);   /* amber */
+  --color-verified:  oklch(0.65 0.19 155);  /* emerald */
+  --color-danger:    oklch(0.64 0.21 25);   /* rose */
+  --color-info:      oklch(0.67 0.17 220);  /* sky */
+
+  /* ── Text ────────────────────────────────────────────────────── */
+  --color-text-primary:   oklch(0.20 0 0 / 0.95);
+  --color-text-secondary: oklch(0.20 0 0 / 0.70);
+  --color-text-muted:     oklch(0.20 0 0 / 0.50);
+
+  /* ── Borders ─────────────────────────────────────────────────── */
+  --color-border-subtle: oklch(0 0 0 / 0.07);
+  --color-border-mid:    oklch(0 0 0 / 0.12);
+  --color-border-accent: oklch(0.65 0.195 155 / 0.35);
+
+  /* ── Shadow tokens (whisper spec) ───────────────────────────── */
+  --shadow-sm:
+    0 0 0 1px oklch(0 0 0 / 0.04),
+    0 1px 2px oklch(0 0 0 / 0.05);
+
+  --shadow-md:
+    0 0 0 1px oklch(0 0 0 / 0.05),
+    0 2px 6px oklch(0 0 0 / 0.05),
+    0 8px 20px oklch(0 0 0 / 0.08);
+
+  --shadow-lg:
+    0 0 0 1px oklch(0 0 0 / 0.05),
+    0 4px 12px oklch(0 0 0 / 0.08),
+    0 16px 40px oklch(0 0 0 / 0.1);
+
+  /* ── Easing curves ───────────────────────────────────────────── */
+  --ease-out-quart:  cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-mid: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Radius scale ────────────────────────────────────────────── */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  18px;
+
+  /* ── Z-index scale ───────────────────────────────────────────── */
+  --z-dropdown: 100;
+  --z-modal:    200;
+  --z-tooltip:  300;
+  --z-toast:    400;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-surface-base);
+    color: var(--color-text-primary);
+    /* Geist Sans — less default than Inter, built for screen */
+    font-family: "Geist Sans", "Geist", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;   /* counters don't jiggle */
+    overflow-x: hidden;
+  }
+
+  /* Prefab interaction states — override per component */
+  [data-interactive] {
+    transition: background-color 150ms var(--ease-out-quart),
+                border-color 150ms var(--ease-out-quart),
+                opacity 150ms var(--ease-out-quart);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Scrollbar — small scroller only */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: oklch(1 0 0 / 0.10);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: oklch(1 0 0 / 0.18); }
+
+/* Radar pulse — RFID simulator only, on bus markers */
+@keyframes radar-pulse {
+  0%   { box-shadow: 0 0 0 0   oklch(0.65 0.195 155 / 0.6); }
+  70%  { box-shadow: 0 0 0 10px oklch(0.65 0.195 155 / 0); }
+  100% { box-shadow: 0 0 0 0   oklch(0.65 0.195 155 / 0); }
+}
+.radar-glow { animation: radar-pulse 2.2s var(--ease-in-out-mid) infinite; }
+
+/* Scanline — simulator terminal only, corrected easing */
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+.scanline-effect { position: relative; overflow: hidden; }
+.scanline-effect::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 25%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    oklch(0.65 0.195 155 / 0.08),
+    transparent
+  );
+  animation: scanline 3s var(--ease-in-out-mid) infinite;
+  pointer-events: none;
+}
+
+/* Leaflet light theme */
+.leaflet-container {
+  background-color: oklch(0.97 0.01 250) !important;
+  font-family: inherit;
+}
+.leaflet-tile {
+  filter: contrast(1.1) saturate(1.2) hue-rotate(5deg) !important;
+}
+.leaflet-popup-content-wrapper {
+  background: oklch(1 0 0) !important;
+  color: oklch(0.20 0 0 / 0.95) !important;
+  border: 1px solid oklch(0 0 0 / 0.10) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 0 !important;
+}
+.leaflet-popup-tip {
+  background: oklch(1 0 0) !important;
+}
+.leaflet-popup-content { margin: 0 !important; line-height: 1.5 !important; }

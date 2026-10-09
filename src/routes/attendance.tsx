@@ -1,0 +1,362 @@
+import { createFileRoute } from '@tanstack/react-router'
+import React, { useState } from 'react'
+import {
+  History,
+  Search,
+  Filter,
+  CheckCircle2,
+  AlertTriangle,
+  HelpCircle,
+  X,
+  ExternalLink,
+  MapPin,
+  Clock,
+  Shield,
+  User,
+  Bus as BusIcon,
+  Download,
+} from 'lucide-react'
+import { useDemoStore } from '@/lib/simulation/use-demo-store'
+import type { TapEvent, VerificationEvidence, VerificationStatus, EventType } from '@/lib/types'
+import { formatDate, formatTime } from '@/lib/utils'
+
+export const Route = createFileRoute('/attendance')({
+  component: AttendanceHistoryPage,
+})
+
+function AttendanceHistoryPage() {
+  const { students, buses, routes, tapEvents, verifications } = useDemoStore()
+
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedBusFilter, setSelectedBusFilter] = useState<string>('all')
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('all')
+  const [selectedTypeFilter, setSelectedTypeFilter] = useState<string>('all')
+
+  // Selected row for detail drawer
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
+
+  // Filtered tap events
+  const filteredEvents = tapEvents.filter((tap) => {
+    const student = students.find((s) => s.id === tap.studentId)
+    const bus = buses.find((b) => b.id === tap.busId)
+
+    const matchesSearch =
+      !searchTerm ||
+      student?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student?.regNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tap.cardUid.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tap.id.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesBus = selectedBusFilter === 'all' || tap.busId === selectedBusFilter
+    const matchesStatus = selectedStatusFilter === 'all' || tap.verificationStatus === selectedStatusFilter
+    const matchesType = selectedTypeFilter === 'all' || tap.type === selectedTypeFilter
+
+    return matchesSearch && matchesBus && matchesStatus && matchesType
+  })
+
+  // Selected event & verification detail
+  const selectedTap = tapEvents.find((t) => t.id === selectedEventId)
+  const selectedVerification = verifications.find((v) => v.tapEventId === selectedEventId)
+  const selectedStudent = students.find((s) => s.id === selectedTap?.studentId)
+  const selectedBus = buses.find((b) => b.id === selectedTap?.busId)
+  const selectedRoute = routes.find((r) => r.id === selectedBus?.currentRouteId)
+
+  return (
+    <div className="space-y-6 pb-12">
+      {/* Header */}
+      <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-mono">
+              Immutable Transit Ledger
+            </span>
+            <span className="text-xs text-slate-400 font-mono">SGT University Bus RFID</span>
+          </div>
+          <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span>Attendance Audit Ledger & History</span>
+          </h2>
+          <p className="text-xs text-slate-400 mt-1">
+            Complete record of boarding and alighting transitions with mobile GPS cross-verification outcomes.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono text-slate-300 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
+            Total Records: <b className="text-emerald-400">{tapEvents.length}</b>
+          </span>
+        </div>
+      </div>
+
+      {/* Filter and Search Bar */}
+      <div className="bg-[--color-surface-raised] p-4 rounded-[--radius-lg] border border-[--color-border-subtle] flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+        {/* Search Input */}
+        <div className="relative w-full md:w-80">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search student name, reg#, or card UID…"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-[--color-surface-overlay] border border-[--color-border-mid] rounded-[--radius-md] pl-9 pr-3 py-2 text-[--color-text-primary] placeholder:text-[--color-text-muted] focus:outline-none focus:border-[--color-accent-500]"
+          />
+        </div>
+
+        {/* Dropdown Filters */}
+        <div className="flex items-center gap-2.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+          {/* Bus Filter */}
+          <select
+            value={selectedBusFilter}
+            onChange={(e) => setSelectedBusFilter(e.target.value)}
+            className="bg-[--color-surface-overlay] border border-[--color-border-mid] rounded-[--radius-md] px-3 py-2 text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-500]"
+          >
+            <option value="all">All Fleet Buses</option>
+            {buses.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.busNumber} ({b.plateNumber})
+              </option>
+            ))}
+          </select>
+
+          {/* Verification Status Filter */}
+          <select
+            value={selectedStatusFilter}
+            onChange={(e) => setSelectedStatusFilter(e.target.value)}
+            className="bg-[--color-surface-overlay] border border-[--color-border-mid] rounded-[--radius-md] px-3 py-2 text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-500]"
+          >
+            <option value="all">All Verification Statuses</option>
+            <option value="verified">Verified Only</option>
+            <option value="flagged">Flagged Only</option>
+            <option value="unverified">Unverified Only</option>
+          </select>
+
+          {/* Event Type Filter */}
+          <select
+            value={selectedTypeFilter}
+            onChange={(e) => setSelectedTypeFilter(e.target.value)}
+            className="bg-[--color-surface-overlay] border border-[--color-border-mid] rounded-[--radius-md] px-3 py-2 text-[--color-text-primary] focus:outline-none focus:border-[--color-accent-500]"
+          >
+            <option value="all">All Event Types</option>
+            <option value="boarding">Boarding (In)</option>
+            <option value="alighting">Alighting (Out)</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Main Table & Detail Drawer Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Table Container (takes full width or 8 cols if drawer open) */}
+        <div className={selectedEventId ? 'lg:col-span-8' : 'lg:col-span-12'}>
+          <div className="bg-[--color-surface-raised] rounded-[--radius-lg] border border-[--color-border-subtle] shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-[--color-border-subtle] bg-[--color-surface-float] text-[--color-text-muted] font-mono text-[11px]">
+                    <th className="py-3 px-3.5">EVENT ID</th>
+                    <th className="py-3 px-3.5">STUDENT & REG#</th>
+                    <th className="py-3 px-3.5">BUS & ROUTE</th>
+                    <th className="py-3 px-3.5">TYPE</th>
+                    <th className="py-3 px-3.5">TIMESTAMP</th>
+                    <th className="py-3 px-3.5">GPS VERIFICATION</th>
+                    <th className="py-3 px-3.5 text-right">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[--color-border-subtle] font-sans">
+                  {filteredEvents.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-10 text-center text-[--color-text-muted] italic">
+                        No attendance events matching selected filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredEvents.map((tap) => {
+                      const student = students.find((s) => s.id === tap.studentId)
+                      const bus = buses.find((b) => b.id === tap.busId)
+                      const isSelected = selectedEventId === tap.id
+
+                      return (
+                        <tr
+                          key={tap.id}
+                          onClick={() => setSelectedEventId(tap.id)}
+                          className={`cursor-pointer transition-colors ${
+                            isSelected
+                              ? 'bg-[--color-surface-overlay] border-l-4 border-l-[--color-accent-500]'
+                              : 'hover:bg-[--color-surface-overlay]'
+                          }`}
+                        >
+                          <td className="py-3 px-3.5 font-mono text-slate-400 font-medium">
+                            {tap.id}
+                          </td>
+                          <td className="py-3 px-3.5">
+                            <div className="font-semibold text-slate-200">{student?.name}</div>
+                            <div className="text-[10px] text-slate-400 font-mono">
+                              {student?.regNumber} • Card: {tap.cardUid}
+                            </div>
+                          </td>
+                          <td className="py-3 px-3.5">
+                            <div className="font-semibold text-slate-200">{bus?.busNumber}</div>
+                            <div className="text-[10px] text-slate-400 truncate max-w-[130px]">
+                              {tap.stopName}
+                            </div>
+                          </td>
+                          <td className="py-3 px-3.5">
+                            <span
+                              className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                tap.type === 'boarding'
+                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                  : 'bg-slate-800 text-slate-300 border border-slate-700'
+                              }`}
+                            >
+                              {tap.type}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3.5 font-mono text-slate-300 text-[11px]">
+                            <div>{formatTime(tap.timestamp)}</div>
+                            <div className="text-[9px] text-slate-500">{formatDate(tap.timestamp)}</div>
+                          </td>
+                          <td className="py-3 px-3.5">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                tap.verificationStatus === 'verified'
+                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                  : tap.verificationStatus === 'flagged'
+                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                                  : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                              }`}
+                            >
+                              {tap.verificationStatus}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3.5 text-right">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedEventId(tap.id)
+                              }}
+                              className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold"
+                            >
+                              Inspect →
+                            </button>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Detailed Evidence Drawer (4 cols when open) */}
+        {selectedEventId && selectedTap && (
+          <div className="lg:col-span-4 bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-md space-y-4">
+            <div className="flex items-center justify-between border-b border-[--color-border-subtle] pb-3">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-xs font-mono font-bold text-slate-200 uppercase">
+                  Event Verification Evidence
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelectedEventId(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Event Summary Pill */}
+            <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-800 text-xs space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Event ID:</span>
+                <span className="font-mono text-slate-200 font-bold">{selectedTap.id}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Student:</span>
+                <span className="text-slate-200 font-semibold">{selectedStudent?.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Registration:</span>
+                <span className="font-mono text-slate-200">{selectedStudent?.regNumber}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Card UID:</span>
+                <span className="font-mono text-emerald-400">{selectedTap.cardUid}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Action:</span>
+                <span className="font-bold uppercase text-slate-200">{selectedTap.type}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Bus & Stoppage:</span>
+                <span className="text-slate-200">{selectedBus?.busNumber} ({selectedTap.stopName})</span>
+              </div>
+            </div>
+
+            {/* Verification Engine Outcome */}
+            {selectedVerification && (
+              <div
+                className={`p-4 rounded-xl border text-xs space-y-2.5 ${
+                  selectedVerification.status === 'verified'
+                    ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
+                    : selectedVerification.status === 'flagged'
+                    ? 'bg-amber-950/40 border-amber-500/40 text-amber-300'
+                    : 'bg-purple-950/40 border-purple-500/40 text-purple-300'
+                }`}
+              >
+                <div className="flex items-center justify-between font-bold text-sm">
+                  <div className="flex items-center gap-1.5">
+                    {selectedVerification.status === 'verified' ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-amber-400" />
+                    )}
+                    <span className="uppercase">{selectedVerification.status}</span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/40">
+                    {selectedVerification.scenario}
+                  </span>
+                </div>
+
+                <div className="text-[11px] leading-relaxed text-slate-200">
+                  {selectedVerification.explanation}
+                </div>
+
+                {/* Haversine distance math display */}
+                <div className="pt-2 border-t border-white/10 space-y-1 font-mono text-[10px] text-slate-300">
+                  <div className="flex justify-between">
+                    <span>Haversine Distance:</span>
+                    <span className="font-bold text-white">
+                      {selectedVerification.distanceMeters >= 0
+                        ? `${selectedVerification.distanceMeters} meters`
+                        : 'No GPS stream'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Configured Max Threshold:</span>
+                    <span className="text-white">150 meters</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Student Phone Telemetry:</span>
+                    <span className="text-white">
+                      {selectedVerification.studentLat
+                        ? `${selectedVerification.studentLat}, ${selectedVerification.studentLng}`
+                        : 'Unavailable'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Vehicle Reader GPS:</span>
+                    <span className="text-white">
+                      {selectedVerification.busLat}, {selectedVerification.busLng}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
