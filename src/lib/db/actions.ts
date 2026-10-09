@@ -395,3 +395,40 @@ export const updateStudentInDB = createServerFn()
       return { success: false }
     }
   })
+
+// 13. Update Bus In DB
+export const updateBusInDB = createServerFn()
+  .validator(
+    (data: {
+      id: string
+      busNumber?: string
+      plateNumber?: string
+      capacity?: number
+      driverName?: string
+      driverPhone?: string
+      status?: 'active' | 'maintenance' | 'offline'
+      currentRouteId?: string
+    }) => data
+  )
+  .handler(async ({ data }) => {
+    if (!db) return { success: false }
+    try {
+      const updateData: Record<string, any> = {}
+      if (data.busNumber !== undefined) updateData.busNumber = data.busNumber
+      if (data.plateNumber !== undefined) updateData.plateNumber = data.plateNumber
+      if (data.capacity !== undefined) updateData.capacity = data.capacity
+      if (data.driverName !== undefined) updateData.driverName = data.driverName
+      if (data.driverPhone !== undefined) updateData.driverPhone = data.driverPhone
+      if (data.status !== undefined) updateData.status = data.status
+      if (data.currentRouteId !== undefined) updateData.currentRouteId = data.currentRouteId
+
+      await db
+        .update(busesTable)
+        .set(updateData)
+        .where(eq(busesTable.id, data.id))
+      return { success: true }
+    } catch (err) {
+      console.warn('updateBusInDB error:', err)
+      return { success: false }
+    }
+  })

@@ -23,6 +23,8 @@ export function useDemoStore() {
     setSimulationSpeed: (speed: number) => demoStore.setSimulationSpeed(speed),
     setRole: (role: Parameters<typeof demoStore.setRole>[0]) => demoStore.setRole(role),
     setActiveStudent: (studentId: string) => demoStore.setActiveStudent(studentId),
+    updateStudent: (studentId: string, patch: any) => demoStore.updateStudent(studentId, patch),
+    updateBus: (busId: string, patch: any) => demoStore.updateBus(busId, patch),
     markAlertRead: (alertId: string) => demoStore.markAlertRead(alertId),
     markAllAlertsRead: () => demoStore.markAllAlertsRead(),
     resetToDefault: () => demoStore.resetToDefault(),

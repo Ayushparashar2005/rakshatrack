@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import {
@@ -20,6 +21,7 @@ import { useDemoStore } from '@/lib/simulation/use-demo-store'
 import type { ReviewDecision, VerificationEvidence } from '@/lib/types'
 import { formatRelativeTime } from '@/lib/utils'
 import { updateVerificationReviewInDB } from '@/lib/db/actions'
+import { useThreshold } from '@/hooks/useThreshold'
 
 export const Route = createFileRoute('/reviews')({
   component: VerificationReviewCenterPage,
@@ -47,6 +49,8 @@ function VerificationReviewCenterPage() {
   const activeStudent = students.find((s) => s.id === activeTap?.studentId)
   const activeBus = buses.find((b) => b.id === activeTap?.busId)
 
+  const activeThreshold = useThreshold()
+
   const handleUpdate = async (status: ReviewDecision) => {
     if (!activeVerif) return
     const note = status === 'dismissed' ? dismissReason || 'Dismissed by transport administrator' : adminNotes
@@ -69,7 +73,9 @@ function VerificationReviewCenterPage() {
   }
 
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin']}>
+      <div className="space-y-6 pb-12">
       {/* Header */}
       <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4" style={{ boxShadow: 'var(--shadow-sm)', borderLeft: '3px solid var(--color-flagged)' }}>
         <div>
@@ -265,7 +271,7 @@ function VerificationReviewCenterPage() {
                 <div className="font-bold mb-1">Calculation Reason:</div>
                 <p className="text-[11px] leading-relaxed">{activeVerif.explanation}</p>
                 <div className="mt-2 text-[10px] font-mono text-amber-700">
-                  Calculated Distance: <b>{activeVerif.distanceMeters >= 0 ? `${activeVerif.distanceMeters}m` : 'N/A'}</b> | Threshold: <b>150m</b>
+                  Calculated Distance: <b>{activeVerif.distanceMeters >= 0 ? `${activeVerif.distanceMeters}m` : 'N/A'}</b> | Threshold: <b>{activeThreshold}m</b>
                 </div>
               </div>
             </div>
@@ -326,5 +332,6 @@ function VerificationReviewCenterPage() {
         )}
       </div>
     </div>
+    </RoleGuard>
   )
 }

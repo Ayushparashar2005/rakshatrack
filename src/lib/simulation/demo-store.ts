@@ -99,6 +99,7 @@ class DemoStore {
   }
 
   private notify() {
+    this.state = { ...this.state }
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state))
@@ -116,6 +117,20 @@ class DemoStore {
 
   public setActiveStudent(studentId: string) {
     this.state.activeStudentId = studentId
+    this.notify()
+  }
+
+  public updateStudent(studentId: string, patch: Partial<Student>) {
+    this.state.students = this.state.students.map((s) =>
+      s.id === studentId ? { ...s, ...patch } : s
+    )
+    this.notify()
+  }
+
+  public updateBus(busId: string, patch: Partial<Bus>) {
+    this.state.buses = this.state.buses.map((b) =>
+      b.id === busId ? { ...b, ...patch } : b
+    )
     this.notify()
   }
 

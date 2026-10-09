@@ -1,52 +1,76 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @theme {
-  /* ── Surfaces (light, elevation by lightness) ─────────────────── */
-  --color-surface-base:     oklch(0.97 0.01 250);    /* background */
-  --color-surface-raised:   oklch(0.99 0.005 250);   /* cards */
-  --color-surface-overlay:  oklch(1 0 0);            /* panels, side panels */
-  --color-surface-float:    oklch(1 0 0);            /* modals, dropdowns */
-  --color-sidebar:          oklch(0.95 0.01 250);    /* sidebar */
+  /* ── Base canvas — warm pearl with subtle tint ────────────────── */
+  --color-surface-base:    oklch(0.955 0.006 250);
+  --color-surface-raised:  oklch(0.975 0.004 250);
+  --color-surface-overlay: oklch(0.985 0.003 250);
+  --color-surface-float:   oklch(1    0     0    );
+  --color-surface-sunken:  oklch(0.940 0.010 250);
+  --color-surface-glass:   oklch(1    0     0 / 0.55);
+  --color-sidebar:         oklch(0.965 0.007 250);
 
-  /* ── Accent ramp (emerald) ───────────────────────────────────── */
-  --color-accent-50:  oklch(0.97 0.048 155);
+  /* ── Emerald accent ramp ──────────────────────────────────────── */
+  --color-accent-50:  oklch(0.97 0.040 155);
+  --color-accent-100: oklch(0.94 0.065 155);
   --color-accent-200: oklch(0.88 0.100 155);
-  --color-accent-400: oklch(0.74 0.172 155);
-  --color-accent-500: oklch(0.65 0.195 155);  /* primary accent */
-  --color-accent-600: oklch(0.57 0.185 155);  /* hover */
-  --color-accent-900: oklch(0.28 0.072 155);  /* glow bg */
+  --color-accent-400: oklch(0.72 0.168 155);
+  --color-accent-500: oklch(0.63 0.188 155);
+  --color-accent-600: oklch(0.55 0.175 155);
+  --color-accent-700: oklch(0.46 0.155 155);
+  --color-accent-900: oklch(0.26 0.068 155);
 
-  /* ── Semantic status ─────────────────────────────────────────── */
-  --color-flagged:   oklch(0.72 0.18 55);   /* amber */
-  --color-verified:  oklch(0.65 0.19 155);  /* emerald */
-  --color-danger:    oklch(0.64 0.21 25);   /* rose */
-  --color-info:      oklch(0.67 0.17 220);  /* sky */
+  /* ── Status palette ───────────────────────────────────────────── */
+  --color-flagged:   oklch(0.72 0.18 55);
+  --color-verified:  oklch(0.63 0.19 155);
+  --color-danger:    oklch(0.60 0.21 25);
+  --color-info:      oklch(0.65 0.17 220);
 
   /* ── Text ────────────────────────────────────────────────────── */
-  --color-text-primary:   oklch(0.20 0 0 / 0.95);
-  --color-text-secondary: oklch(0.20 0 0 / 0.70);
-  --color-text-muted:     oklch(0.20 0 0 / 0.50);
+  --color-text-primary:   oklch(0.20 0.010 250);
+  --color-text-secondary: oklch(0.36 0.008 250);
+  --color-text-muted:     oklch(0.54 0.007 250);
+  --color-text-ghost:     oklch(0.70 0.005 250);
 
   /* ── Borders ─────────────────────────────────────────────────── */
-  --color-border-subtle: oklch(0 0 0 / 0.07);
-  --color-border-mid:    oklch(0 0 0 / 0.12);
-  --color-border-accent: oklch(0.65 0.195 155 / 0.35);
+  --color-border-subtle: oklch(0 0 0 / 0.06);
+  --color-border-mid:    oklch(0 0 0 / 0.10);
+  --color-border-strong: oklch(0 0 0 / 0.16);
+  --color-border-accent: oklch(0.63 0.188 155 / 0.30);
 
-  /* ── Shadow tokens (whisper spec) ───────────────────────────── */
-  --shadow-sm:
-    0 0 0 1px oklch(0 0 0 / 0.04),
-    0 1px 2px oklch(0 0 0 / 0.05);
+  /* ── Neumorphic shadow tokens (top-left light source) ──────── */
+  --nm-raised:
+    5px 5px 12px oklch(0 0 0 / 0.10),
+    -4px -4px 10px oklch(1 0 0 / 0.82);
+  --nm-raised-lg:
+    8px 8px 20px oklch(0 0 0 / 0.13),
+    -6px -6px 14px oklch(1 0 0 / 0.88);
+  --nm-inset:
+    inset 3px 3px 7px oklch(0 0 0 / 0.10),
+    inset -2px -2px 5px oklch(1 0 0 / 0.78);
+  --nm-inset-deep:
+    inset 4px 4px 10px oklch(0 0 0 / 0.12),
+    inset -3px -3px 7px oklch(1 0 0 / 0.82);
+  --nm-flat:
+    2px 2px 6px oklch(0 0 0 / 0.07),
+    -1px -1px 4px oklch(1 0 0 / 0.72);
 
-  --shadow-md:
-    0 0 0 1px oklch(0 0 0 / 0.05),
-    0 2px 6px oklch(0 0 0 / 0.05),
-    0 8px 20px oklch(0 0 0 / 0.08);
+  /* ── Glass shadow tokens ────────────────────────────────────── */
+  --glass-shadow:
+    0 4px 24px oklch(0 0 0 / 0.08),
+    0 1px 3px oklch(0 0 0 / 0.05),
+    inset 0 1px 0 oklch(1 0 0 / 0.65);
+  --glass-shadow-lg:
+    0 8px 40px oklch(0 0 0 / 0.10),
+    0 2px 8px oklch(0 0 0 / 0.06),
+    inset 0 1px 0 oklch(1 0 0 / 0.70);
 
-  --shadow-lg:
-    0 0 0 1px oklch(0 0 0 / 0.05),
-    0 4px 12px oklch(0 0 0 / 0.08),
-    0 16px 40px oklch(0 0 0 / 0.1);
+  /* ── Legacy shadow aliases ────────────────────────────────── */
+  --shadow-sm: var(--nm-flat);
+  --shadow-md: var(--nm-raised);
+  --shadow-lg: var(--nm-raised-lg);
 
   /* ── Easing curves ───────────────────────────────────────────── */
   --ease-out-quart:  cubic-bezier(0.25, 1, 0.5, 1);
@@ -54,11 +78,12 @@
   --ease-in-out-mid: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* ── Radius scale ────────────────────────────────────────────── */
-  --radius-sm:  6px;
-  --radius-md:  10px;
-  --radius-lg:  14px;
-  --radius-xl:  18px;
+  /* ── Radius scale ─────────────────────────────────────────────── */
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  22px;
+  --radius-2xl: 28px;
 
   /* ── Z-index scale ───────────────────────────────────────────── */
   --z-dropdown: 100;
@@ -67,23 +92,32 @@
   --z-toast:    400;
 }
 
+/* ─── GLOBAL BASE ─────────────────────────────────────────────── */
 @layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
   body {
     background-color: var(--color-surface-base);
     color: var(--color-text-primary);
-    /* Geist Sans — less default than Inter, built for screen */
-    font-family: "Geist Sans", "Geist", ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-variant-numeric: tabular-nums;   /* counters don't jiggle */
+    font-variant-numeric: tabular-nums;
     overflow-x: hidden;
+    /* Ambient mesh gradient */
+    background-image:
+      radial-gradient(ellipse 80% 50% at 10% 0%,   oklch(0.92 0.020 155 / 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 100%,  oklch(0.90 0.022 220 / 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 50% 50%,   oklch(0.94 0.012 300 / 0.07) 0%, transparent 70%);
+    min-height: 100vh;
   }
 
-  /* Prefab interaction states — override per component */
   [data-interactive] {
-    transition: background-color 150ms var(--ease-out-quart),
-                border-color 150ms var(--ease-out-quart),
-                opacity 150ms var(--ease-out-quart);
+    transition:
+      background-color 180ms var(--ease-out-quart),
+      border-color     180ms var(--ease-out-quart),
+      box-shadow       200ms var(--ease-out-quart),
+      transform        150ms var(--ease-spring);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -94,60 +128,244 @@
   }
 }
 
-/* Scrollbar — small scroller only */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* ─── SCROLLBAR ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: oklch(0 0 0 / 0.14);
-  border-radius: 3px;
+  background: oklch(0 0 0 / 0.12);
+  border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover { background: oklch(0 0 0 / 0.24); }
+::-webkit-scrollbar-thumb:hover { background: oklch(0 0 0 / 0.20); }
 
-/* Radar pulse — RFID simulator only, on bus markers */
+/* ─── NEUMORPHIC CARD (convex — pops up from surface) ─────────── */
+.nm-card {
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--nm-raised);
+  border: 1px solid oklch(1 0 0 / 0.72);
+  position: relative;
+  overflow: hidden;
+}
+.nm-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, oklch(1 0 0 / 0.40) 0%, transparent 55%);
+  pointer-events: none;
+}
+.nm-card:hover {
+  box-shadow: var(--nm-raised-lg);
+  transform: translateY(-1px);
+  transition: box-shadow 220ms var(--ease-out-expo), transform 180ms var(--ease-spring);
+}
+
+/* ─── NEUMORPHIC INSET (concave — sinks into surface) ─────────── */
+.nm-inset {
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-md);
+  box-shadow: var(--nm-inset);
+  border: 1px solid oklch(0 0 0 / 0.04);
+}
+
+/* ─── GLASS CARD (frosted translucent) ────────────────────────── */
+.glass-card {
+  background: oklch(1 0 0 / 0.52);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-radius: var(--radius-lg);
+  border: 1px solid oklch(1 0 0 / 0.58);
+  box-shadow: var(--glass-shadow);
+  position: relative;
+  overflow: hidden;
+}
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.85), transparent);
+  pointer-events: none;
+}
+
+/* ─── GLASS CARD LARGE ────────────────────────────────────────── */
+.glass-card-lg {
+  background: oklch(1 0 0 / 0.42);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-radius: var(--radius-xl);
+  border: 1px solid oklch(1 0 0 / 0.62);
+  box-shadow: var(--glass-shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+.glass-card-lg::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.92), transparent);
+  pointer-events: none;
+}
+
+/* ─── NEUMORPHIC BUTTON ───────────────────────────────────────── */
+.nm-btn {
+  box-shadow: var(--nm-raised);
+  border: 1px solid oklch(1 0 0 / 0.72);
+  transition:
+    box-shadow 180ms var(--ease-out-quart),
+    transform  100ms var(--ease-spring);
+}
+.nm-btn:hover { box-shadow: var(--nm-raised-lg); }
+.nm-btn:active {
+  box-shadow: var(--nm-inset);
+  transform: scale(0.97);
+}
+
+/* ─── STAT CARD ───────────────────────────────────────────────── */
+.stat-card {
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--nm-raised);
+  border: 1px solid oklch(1 0 0 / 0.65);
+  transition:
+    box-shadow 220ms var(--ease-out-expo),
+    transform  180ms var(--ease-spring);
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.80), transparent);
+  pointer-events: none;
+}
+.stat-card:hover {
+  box-shadow: var(--nm-raised-lg);
+  transform: translateY(-2px);
+}
+
+/* ─── NEUMORPHIC INPUTS ───────────────────────────────────────── */
+.nm-input {
+  background: var(--color-surface-sunken);
+  box-shadow: var(--nm-inset-deep);
+  border: 1px solid oklch(0 0 0 / 0.05);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  transition:
+    box-shadow 180ms var(--ease-out-quart),
+    border-color 180ms;
+}
+.nm-input::placeholder { color: var(--color-text-ghost); }
+.nm-input:focus {
+  outline: none;
+  box-shadow:
+    var(--nm-inset-deep),
+    0 0 0 3px oklch(0.63 0.188 155 / 0.18);
+  border-color: oklch(0.63 0.188 155 / 0.40);
+}
+
+.nm-select {
+  background: var(--color-surface-sunken);
+  box-shadow: var(--nm-inset);
+  border: 1px solid oklch(0 0 0 / 0.05);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  transition: box-shadow 180ms var(--ease-out-quart);
+}
+.nm-select:focus {
+  outline: none;
+  box-shadow:
+    var(--nm-inset),
+    0 0 0 3px oklch(0.63 0.188 155 / 0.18);
+}
+
+/* ─── TABLE ROWS ─────────────────────────────────────────────── */
+.glass-table-row {
+  transition:
+    background 150ms var(--ease-out-quart),
+    box-shadow 150ms;
+}
+.glass-table-row:hover {
+  background: oklch(1 0 0 / 0.48);
+  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.52);
+}
+.glass-table-row.selected {
+  background: oklch(0.63 0.188 155 / 0.07);
+  box-shadow:
+    inset 0 0 0 1px oklch(0.63 0.188 155 / 0.22),
+    inset 3px 0 0 0 oklch(0.63 0.188 155 / 0.65);
+}
+
+/* ─── SIDEBAR NAV ─────────────────────────────────────────────── */
+.sidebar-nav-item {
+  border-radius: var(--radius-md);
+  transition:
+    background 180ms var(--ease-out-quart),
+    box-shadow 180ms var(--ease-out-quart);
+}
+.sidebar-nav-item:hover {
+  background: oklch(1 0 0 / 0.55);
+  box-shadow: var(--nm-flat);
+}
+.sidebar-nav-item.active {
+  background: var(--color-surface-raised);
+  box-shadow: var(--nm-inset);
+}
+
+/* ─── ANIMATIONS ─────────────────────────────────────────────── */
 @keyframes radar-pulse {
-  0%   { box-shadow: 0 0 0 0   oklch(0.65 0.195 155 / 0.6); }
-  70%  { box-shadow: 0 0 0 10px oklch(0.65 0.195 155 / 0); }
-  100% { box-shadow: 0 0 0 0   oklch(0.65 0.195 155 / 0); }
+  0%   { box-shadow: 0 0 0 0    oklch(0.63 0.188 155 / 0.60); }
+  70%  { box-shadow: 0 0 0 12px oklch(0.63 0.188 155 / 0); }
+  100% { box-shadow: 0 0 0 0    oklch(0.63 0.188 155 / 0); }
 }
 .radar-glow { animation: radar-pulse 2.2s var(--ease-in-out-mid) infinite; }
 
-/* Scanline — simulator terminal only, corrected easing */
 @keyframes scanline {
   0%   { transform: translateY(-100%); }
   100% { transform: translateY(200%); }
 }
 .scanline-effect { position: relative; overflow: hidden; }
 .scanline-effect::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 25%;
   background: linear-gradient(
-    to bottom,
-    transparent,
-    oklch(0.65 0.195 155 / 0.08),
+    to bottom, transparent,
+    oklch(0.63 0.188 155 / 0.06),
     transparent
   );
   animation: scanline 3s var(--ease-in-out-mid) infinite;
   pointer-events: none;
 }
 
-/* Leaflet light theme */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+.live-dot { animation: live-pulse 1.5s ease-in-out infinite; }
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+/* ─── LEAFLET ─────────────────────────────────────────────────── */
 .leaflet-container {
-  background-color: oklch(0.97 0.01 250) !important;
-  font-family: inherit;
+  background-color: oklch(0.955 0.006 250) !important;
+  font-family: 'Inter', sans-serif;
 }
 .leaflet-tile {
-  filter: contrast(1.1) saturate(1.2) hue-rotate(5deg) !important;
+  filter: contrast(1.05) saturate(1.12) brightness(1.02) hue-rotate(3deg) !important;
 }
 .leaflet-popup-content-wrapper {
-  background: oklch(1 0 0) !important;
-  color: oklch(0.20 0 0 / 0.95) !important;
-  border: 1px solid oklch(0 0 0 / 0.10) !important;
-  box-shadow: var(--shadow-lg) !important;
+  background: oklch(1 0 0 / 0.82) !important;
+  backdrop-filter: blur(16px) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid oklch(1 0 0 / 0.70) !important;
+  box-shadow: var(--glass-shadow-lg) !important;
   border-radius: var(--radius-lg) !important;
   padding: 0 !important;
 }
-.leaflet-popup-tip {
-  background: oklch(1 0 0) !important;
-}
+.leaflet-popup-tip { background: oklch(1 0 0 / 0.82) !important; }
 .leaflet-popup-content { margin: 0 !important; line-height: 1.5 !important; }
+

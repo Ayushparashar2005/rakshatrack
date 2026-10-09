@@ -79,7 +79,11 @@ export interface VerificationInput {
  * Follows the core principle: FLAG, NOT BLOCK.
  */
 export function verifyGpsPresence(input: VerificationInput): VerificationEvidence {
-  const threshold = input.proximityThresholdMeters ?? DEFAULT_PROXIMITY_THRESHOLD_METERS
+  const defaultThreshold = input.proximityThresholdMeters ?? DEFAULT_PROXIMITY_THRESHOLD_METERS
+  const threshold = typeof window !== 'undefined'
+    ? Number(localStorage.getItem('raksha_proximity_threshold') || defaultThreshold)
+    : defaultThreshold
+    
   const { busLat, busLng, scenario, tapEventId } = input
 
   let studentLat: number | null = null

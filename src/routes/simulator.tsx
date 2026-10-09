@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import {
@@ -137,9 +138,11 @@ function AttendanceSimulatorPage() {
   }
 
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin']}>
+      <div className="space-y-6 pb-12">
       {/* Page Header */}
-      <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle]" style={{ boxShadow: 'var(--shadow-sm)', borderLeft: '3px solid var(--color-accent-500)' }}>
+      <div className="nm-card p-6 border-l-4 border-l-[--color-accent-500]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -170,7 +173,7 @@ function AttendanceSimulatorPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Form Controls (7 cols) */}
         <div className="lg:col-span-7 space-y-5">
-          <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] space-y-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
+          <div className="nm-card p-6 space-y-6">
             <h3 className="text-sm font-bold text-[--color-text-primary] uppercase tracking-wider flex items-center gap-2">
               <Radio className="w-4 h-4 text-emerald-600" />
               <span>1. Configure Simulated Tap Scenario</span>
@@ -184,7 +187,7 @@ function AttendanceSimulatorPage() {
               <select
                 value={selectedStudentId}
                 onChange={(e) => setSelectedStudentId(e.target.value)}
-                className="w-full bg-[--color-surface-base] border border-[--color-border-mid] rounded-xl px-3.5 py-2.5 text-xs text-[--color-text-primary] font-medium focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="nm-select w-full px-3.5 py-2.5 text-xs font-medium"
               >
                 {students.map((student) => (
                   <option key={student.id} value={student.id} className="bg-[--color-surface-raised] text-[--color-text-primary]">
@@ -195,7 +198,7 @@ function AttendanceSimulatorPage() {
 
               {/* Student Details Card */}
               {selectedStudent && (
-                <div className="mt-2.5 p-3 rounded-xl bg-[--color-surface-base] border border-[--color-border-subtle] text-xs grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="nm-inset mt-3 p-3.5 text-xs grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div>
                     <span className="text-[10px] text-[--color-text-muted] block">Department</span>
                     <span className="font-semibold text-[--color-text-primary] truncate block">
@@ -242,7 +245,7 @@ function AttendanceSimulatorPage() {
                 <select
                   value={selectedBusId}
                   onChange={(e) => setSelectedBusId(e.target.value)}
-                  className="w-full bg-[--color-surface-base] border border-[--color-border-mid] rounded-xl px-3.5 py-2.5 text-xs text-[--color-text-primary] font-medium focus:outline-none focus:border-emerald-500"
+                  className="nm-select w-full px-3.5 py-2.5 text-xs font-medium"
                 >
                   {buses.map((bus) => (
                     <option key={bus.id} value={bus.id} className="bg-[--color-surface-raised] text-[--color-text-primary]">
@@ -380,12 +383,11 @@ function AttendanceSimulatorPage() {
                 type="button"
                 onClick={handleSimulateTap}
                 disabled={isProcessing}
-                className={`w-full py-4 px-6 rounded-[--radius-lg] font-black text-sm md:text-base tracking-wider uppercase transition-[background-color,transform,box-shadow,border-color,opacity] duration-150 flex items-center justify-center gap-3 active:scale-[0.98] ${
+                className={`nm-btn w-full py-4 px-6 rounded-xl font-black text-sm tracking-widest uppercase flex items-center justify-center gap-3 ${
                   isProcessing
-                    ? 'bg-[--color-surface-base] text-[--color-text-muted] cursor-not-allowed border border-[--color-border-subtle]'
-                    : 'bg-[--color-accent-500] hover:bg-[--color-accent-400] text-slate-950 cursor-pointer'
+                    ? 'bg-[--color-surface-base] text-[--color-text-muted] cursor-not-allowed'
+                    : 'bg-[--color-accent-500] text-slate-950 cursor-pointer'
                 }`}
-                style={{ boxShadow: isProcessing ? 'none' : 'var(--shadow-sm)' }}
               >
                 {isProcessing ? (
                   <>
@@ -406,7 +408,7 @@ function AttendanceSimulatorPage() {
         {/* Right Column: Simulated RFID Hardware Device Faceplate (5 cols) */}
         <div className="lg:col-span-5 space-y-5">
           {/* Hardware Reader Unit Simulation */}
-          <div className="bg-[--color-surface-overlay] p-6 rounded-[--radius-lg] border border-[--color-border-subtle] relative overflow-hidden scanline-effect" style={{ boxShadow: 'var(--shadow-md)' }}>
+          <div className="glass-card p-6 scanline-effect">
             <div className="flex items-center justify-between border-b border-[--color-border-subtle] pb-3 mb-4">
               <div className="flex items-center gap-2">
                 <Radio className="w-4 h-4 text-emerald-600" />
@@ -506,7 +508,7 @@ function AttendanceSimulatorPage() {
       </div>
 
       {/* Recent Tap Events Table */}
-      <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] space-y-4" style={{ boxShadow: 'var(--shadow-sm)' }}>
+      <div className="nm-card p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-emerald-600" />
@@ -542,7 +544,7 @@ function AttendanceSimulatorPage() {
                 const bus = buses.find((b) => b.id === tap.busId)
 
                 return (
-                  <tr key={tap.id} className="hover:bg-[--color-surface-base] transition-colors">
+                  <tr key={tap.id} className="glass-table-row">
                     <td className="py-2.5 px-3 font-mono text-[--color-text-muted] font-medium">{tap.id}</td>
                     <td className="py-2.5 px-3">
                       <div className="font-semibold text-[--color-text-primary]">{student?.name}</div>
@@ -588,5 +590,6 @@ function AttendanceSimulatorPage() {
         </div>
       </div>
     </div>
+    </RoleGuard>
   )
 }

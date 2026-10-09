@@ -26,7 +26,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
   const routerState = useRouterState()
   const currentPath = routerState.location.pathname
-  const { verifications, alerts, routeRequests } = useDemoStore()
+  const { verifications, alerts, routeRequests, currentRole } = useDemoStore()
 
   const pendingReviewsCount = verifications.filter(
     (v) => v.status === 'flagged' && v.reviewStatus === 'pending'
@@ -35,151 +35,120 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
   const unreadAlertsCount = alerts.filter((a) => !a.isRead).length
   const pendingRequestsCount = routeRequests.filter((r) => r.status === 'pending').length
 
-  const navSections = [
+  const allNavSections = [
     {
       title: 'CORE PLATFORM',
+      roles: ['admin', 'student', 'guardian'],
       items: [
-        {
-          name: 'Dashboard',
-          to: '/',
-          icon: LayoutDashboard,
-          badge: null,
-        },
-        {
-          name: 'Fleet Tracking',
-          to: '/fleet',
-          icon: MapPin,
-          badge: 'Live Map',
-          badgeColor: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-        },
+        { name: 'Dashboard',     to: '/',      icon: LayoutDashboard, badge: null, roles: ['admin', 'student', 'guardian'] },
+        { name: 'Fleet Tracking',to: '/fleet', icon: MapPin,           badge: 'Live', badgeColor: 'emerald', roles: ['admin'] },
       ],
     },
     {
       title: 'OPERATIONS',
+      roles: ['admin', 'student'],
       items: [
-        {
-          name: 'Attendance Simulator',
-          to: '/simulator',
-          icon: Radio,
-          badge: 'Demo RFID',
-          badgeColor: 'bg-emerald-500 text-slate-950 font-bold',
-        },
-        {
-          name: 'Attendance History',
-          to: '/attendance',
-          icon: History,
-          badge: null,
-        },
-        {
-          name: 'Verification Reviews',
-          to: '/reviews',
-          icon: ShieldAlert,
-          badge: pendingReviewsCount > 0 ? `${pendingReviewsCount}` : null,
-          badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold',
-        },
+        { name: 'Attendance Simulator', to: '/simulator',  icon: Radio,        badge: 'RFID',  badgeColor: 'accent', roles: ['admin'] },
+        { name: 'Attendance History',   to: '/attendance', icon: History,       badge: null, roles: ['admin', 'student'] },
+        { name: 'Verification Reviews', to: '/reviews',    icon: ShieldAlert,   badge: pendingReviewsCount > 0 ? `${pendingReviewsCount}` : null, badgeColor: 'amber', roles: ['admin'] },
       ],
     },
     {
       title: 'MANAGEMENT',
+      roles: ['admin', 'student'],
       items: [
-        {
-          name: 'Students',
-          to: '/students',
-          icon: Users,
-          badge: '50',
-          badgeColor: 'bg-slate-800 text-slate-400',
-        },
-        {
-          name: 'Buses',
-          to: '/buses',
-          icon: BusIcon,
-          badge: '4 Active',
-          badgeColor: 'bg-slate-800 text-slate-400',
-        },
-        {
-          name: 'Routes & Stops',
-          to: '/routes',
-          icon: RouteIcon,
-          badge: '3 Routes',
-          badgeColor: 'bg-slate-800 text-slate-400',
-        },
-        {
-          name: 'Route Requests',
-          to: '/route-requests',
-          icon: GitPullRequest,
-          badge: pendingRequestsCount > 0 ? `${pendingRequestsCount}` : null,
-          badgeColor: 'bg-sky-500/20 text-sky-300 border border-sky-500/30',
-        },
-        {
-          name: 'Alerts',
-          to: '/alerts',
-          icon: Bell,
-          badge: unreadAlertsCount > 0 ? `${unreadAlertsCount}` : null,
-          badgeColor: 'bg-rose-500/20 text-rose-300 border border-rose-500/30',
-        },
+        { name: 'Students',       to: '/students',       icon: Users,          badge: '50',      badgeColor: 'neutral', roles: ['admin'] },
+        { name: 'Buses',          to: '/buses',          icon: BusIcon,        badge: '4',       badgeColor: 'neutral', roles: ['admin'] },
+        { name: 'Routes & Stops', to: '/routes',         icon: RouteIcon,      badge: '3',       badgeColor: 'neutral', roles: ['admin'] },
+        { name: 'Route Requests', to: '/route-requests', icon: GitPullRequest, badge: pendingRequestsCount > 0 ? `${pendingRequestsCount}` : null, badgeColor: 'sky', roles: ['admin', 'student'] },
+        { name: 'Alerts',         to: '/alerts',         icon: Bell,           badge: unreadAlertsCount > 0 ? `${unreadAlertsCount}` : null, badgeColor: 'rose', roles: ['admin'] },
       ],
     },
     {
       title: 'PORTALS',
+      roles: ['admin', 'student', 'guardian'],
       items: [
-        {
-          name: 'Student Portal',
-          to: '/student-portal',
-          icon: GraduationCap,
-          badge: null,
-        },
-        {
-          name: 'Guardian Portal',
-          to: '/guardian-portal',
-          icon: HeartHandshake,
-          badge: null,
-        },
+        { name: 'Student Portal',  to: '/student-portal',  icon: GraduationCap,  badge: null, roles: ['admin', 'student'] },
+        { name: 'Guardian Portal', to: '/guardian-portal', icon: HeartHandshake, badge: null, roles: ['admin', 'guardian'] },
       ],
     },
     {
       title: 'SYSTEM',
+      roles: ['admin'],
       items: [
-        {
-          name: 'Settings & Status',
-          to: '/settings',
-          icon: Settings,
-          badge: null,
-        },
+        { name: 'Settings & Status', to: '/settings', icon: Settings, badge: null, roles: ['admin'] },
       ],
     },
   ]
 
+  const navSections = allNavSections
+    .filter(section => section.roles.includes(currentRole))
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => item.roles.includes(currentRole))
+    }))
+    .filter(section => section.items.length > 0)
+
+  const badgeStyles: Record<string, string> = {
+    emerald:  'bg-emerald-100 text-emerald-700 border border-emerald-200',
+    accent:   'bg-emerald-600 text-white',
+    amber:    'bg-amber-100 text-amber-700 border border-amber-200',
+    neutral:  'bg-[--color-surface-sunken] text-[--color-text-muted] border border-[--color-border-subtle]',
+    sky:      'bg-sky-100 text-sky-700 border border-sky-200',
+    rose:     'bg-rose-100 text-rose-700 border border-rose-200',
+  }
+
   return (
-    <aside className="w-64 h-full bg-[--color-sidebar] border-r border-[--color-border-subtle] flex flex-col flex-shrink-0 select-none">
-      {/* Brand Header */}
-      <div className="p-4 border-b border-[--color-border-subtle] bg-[--color-surface-base]">
+    <aside
+      className="w-64 h-full flex flex-col flex-shrink-0 select-none border-r"
+      style={{
+        background: 'var(--color-sidebar)',
+        borderColor: 'var(--color-border-subtle)',
+      }}
+    >
+      {/* Brand Header — glass pill */}
+      <div
+        className="p-4 border-b"
+        style={{
+          borderColor: 'var(--color-border-subtle)',
+          background: 'linear-gradient(145deg, oklch(1 0 0 / 0.60), oklch(1 0 0 / 0.30))',
+        }}
+      >
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-[--color-accent-500] flex items-center justify-center shadow-sm">
-            <div className="h-[36px] w-[36px] bg-[--color-surface-base] rounded-[8px] flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5 text-[--color-accent-500]" />
-            </div>
+          {/* Logo mark — neumorphic circle */}
+          <div
+            className="h-10 w-10 rounded-2xl flex items-center justify-center flex-shrink-0"
+            style={{ boxShadow: 'var(--nm-raised)', background: 'var(--color-surface-raised)', border: '1px solid oklch(1 0 0 / 0.72)' }}
+          >
+            <ShieldCheck className="w-5 h-5" style={{ color: 'var(--color-accent-500)' }} />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-base tracking-tight text-[--color-text-primary]">
-                Raksha<span className="text-[--color-accent-500]">Track</span>
+              <span className="font-bold text-[15px] tracking-tight" style={{ color: 'var(--color-text-primary)' }}>
+                Raksha<span style={{ color: 'var(--color-accent-500)' }}>Track</span>
               </span>
-              <span className="text-[9px] px-1.5 py-0.5 bg-[--color-accent-500]/10 text-[--color-accent-500] border border-[--color-accent-500]/20 rounded font-semibold uppercase tracking-wide">
-                v2.0
+              <span
+                className="text-[9px] px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider"
+                style={{ background: 'var(--color-accent-500)', color: 'white' }}
+              >
+                v2
               </span>
             </div>
-            <p className="text-[11px] text-[--color-text-muted] font-medium truncate">
+            <p className="text-[11px] font-medium truncate" style={{ color: 'var(--color-text-muted)' }}>
               SGT University Transport
             </p>
           </div>
         </div>
       </div>
 
-      {/* Navigation Sections */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
         {navSections.map((section) => (
-          <div key={section.title} className="space-y-1">
-            <div className="px-3 pb-1 text-[10px] font-bold tracking-wider text-[--color-text-muted] uppercase">
+          <div key={section.title} className="space-y-0.5">
+            <div
+              className="px-3 pb-2 text-[10px] font-bold tracking-widest uppercase"
+              style={{ color: 'var(--color-text-ghost)' }}
+            >
               {section.title}
             </div>
             {section.items.map((item) => {
@@ -190,25 +159,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                   key={item.to}
                   to={item.to}
                   onClick={onCloseMobile}
-                  className={`group flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors border-l-[3px] ${
-                    isActive
-                      ? 'bg-[--color-surface-overlay] text-[--color-accent-500] font-semibold border-[--color-accent-500] pl-[calc(theme(spacing.3)-3px)]'
-                      : 'text-[--color-text-secondary] border-transparent [@media(hover:hover)]:hover:text-[--color-text-primary] [@media(hover:hover)]:hover:bg-[--color-surface-raised]'
-                  }`}
+                  className="group flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150"
+                  style={isActive ? {
+                    background: 'var(--color-surface-raised)',
+                    boxShadow: 'var(--nm-inset)',
+                    color: 'var(--color-accent-500)',
+                    fontWeight: 600,
+                  } : {
+                    color: 'var(--color-text-secondary)',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLElement).style.background = 'oklch(1 0 0 / 0.55)'
+                      ;(e.currentTarget as HTMLElement).style.boxShadow = 'var(--nm-flat)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLElement).style.background = ''
+                      ;(e.currentTarget as HTMLElement).style.boxShadow = ''
+                    }
+                  }}
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Icon
-                      className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                        isActive ? 'text-[--color-accent-500]' : 'text-[--color-text-muted] group-hover:text-[--color-text-secondary]'
-                      }`}
+                      className="w-4 h-4 flex-shrink-0"
+                      style={{ color: isActive ? 'var(--color-accent-500)' : 'var(--color-text-muted)' }}
                     />
                     <span className="truncate">{item.name}</span>
                   </div>
                   {item.badge && (
                     <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                        item.badgeColor || 'bg-[--color-surface-overlay] text-[--color-text-muted]'
-                      }`}
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full flex-shrink-0 font-semibold ${badgeStyles[item.badgeColor || 'neutral']}`}
                     >
                       {item.badge}
                     </span>
@@ -220,22 +202,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
         ))}
       </div>
 
-      {/* Bottom Status Card */}
-      <div className="p-3 border-t border-[--color-border-subtle] bg-[--color-surface-base]">
-        <div className="bg-[--color-surface-overlay] rounded-lg p-2.5 border border-[--color-border-mid] text-[11px] space-y-1.5">
+      {/* Bottom status — glass card */}
+      <div
+        className="p-3 border-t"
+        style={{ borderColor: 'var(--color-border-subtle)', background: 'oklch(1 0 0 / 0.35)' }}
+      >
+        <div
+          className="rounded-xl p-3 text-[11px] space-y-2"
+          style={{ boxShadow: 'var(--nm-inset)', background: 'var(--color-surface-sunken)', border: '1px solid var(--color-border-subtle)' }}
+        >
           <div className="flex items-center justify-between">
-            <span className="text-[--color-text-muted]">Policy:</span>
-            <span className="text-[--color-accent-500] font-semibold flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-[--color-accent-500]" /> Flag, Not Block
+            <span style={{ color: 'var(--color-text-muted)' }}>Policy:</span>
+            <span className="font-semibold flex items-center gap-1" style={{ color: 'var(--color-accent-600)' }}>
+              <CheckCircle2 className="w-3 h-3" />
+              Flag, Not Block
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[--color-text-muted]">Simulation:</span>
-            <span className="text-[--color-text-secondary] font-mono">In-Memory Engine</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>Engine:</span>
+            <span className="font-mono" style={{ color: 'var(--color-text-secondary)' }}>Haversine GPS</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[--color-text-muted]">Campus:</span>
-            <span className="text-[--color-text-secondary]">SGT Budhera (HR)</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>Campus:</span>
+            <span style={{ color: 'var(--color-text-secondary)' }}>Budhera, HR</span>
           </div>
         </div>
       </div>

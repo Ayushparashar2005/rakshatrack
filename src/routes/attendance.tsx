@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import {
@@ -19,6 +20,7 @@ import {
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
 import type { TapEvent, VerificationEvidence, VerificationStatus, EventType } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
+import { useThreshold } from '@/hooks/useThreshold'
 
 export const Route = createFileRoute('/attendance')({
   component: AttendanceHistoryPage,
@@ -62,8 +64,33 @@ function AttendanceHistoryPage() {
   const selectedBus = buses.find((b) => b.id === selectedTap?.busId)
   const selectedRoute = routes.find((r) => r.id === selectedBus?.currentRouteId)
 
+  const activeThreshold = useThreshold()
+
+  const handleExportCsv = () => {
+    import('@/lib/utils').then(({ exportToCsv }) => {
+      const exportData = filteredEvents.map(tap => {
+        const student = students.find((s) => s.id === tap.studentId)
+        const bus = buses.find((b) => b.id === tap.busId)
+        return {
+          'Event ID': tap.id,
+          'Student Name': student?.name || 'Unknown',
+          'Reg Number': student?.regNumber || 'Unknown',
+          'Card UID': tap.cardUid,
+          'Bus Number': bus?.busNumber || 'Unknown',
+          'Stop Name': tap.stopName || '',
+          'Event Type': tap.type,
+          'Timestamp': tap.timestamp,
+          'Verification Status': tap.verificationStatus
+        }
+      })
+      exportToCsv(`attendance_export_${new Date().getTime()}.csv`, exportData)
+    })
+  }
+
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin', 'student']}>
+      <div className="space-y-6 pb-12">
       {/* Header */}
       <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -81,10 +108,17 @@ function AttendanceHistoryPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <span className="text-xs font-mono text-[--color-text-secondary] bg-[--color-surface-sunken] border border-[--color-border-subtle] px-3 py-1.5 rounded-xl">
             Total Records: <b className="text-emerald-700">{tapEvents.length}</b>
           </span>
+          <button
+            onClick={handleExportCsv}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-xs transition-colors"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export CSV</span>
+          </button>
         </div>
       </div>
 
@@ -335,7 +369,7 @@ function AttendanceHistoryPage() {
                   </div>
                   <div className="flex justify-between">
                     <span>Configured Max Threshold:</span>
-                    <span className="text-[--color-text-primary]">150 meters</span>
+                    <span className="text-[--color-text-primary]">{activeThreshold} meters</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Student Phone Telemetry:</span>
@@ -358,5 +392,6 @@ function AttendanceHistoryPage() {
         )}
       </div>
     </div>
+    </RoleGuard>
   )
 }

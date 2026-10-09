@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import {
@@ -85,12 +86,14 @@ function DashboardPage() {
   ]
 
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin', 'student', 'guardian']}>
+      <div className="space-y-6 pb-12">
       {/* Hero Presentation Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+      <div className="nm-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="text-[11px] font-bold uppercase tracking-wider bg-emerald-500/10 text-[--color-accent-600] border border-[--color-border-accent] px-2.5 py-0.5 rounded-full font-mono">
               University Transport HQ
             </span>
             <span className="text-xs text-[--color-text-muted] font-mono">
@@ -102,7 +105,7 @@ function DashboardPage() {
           </h2>
           <p className="text-xs md:text-sm text-[--color-text-muted] max-w-2xl mt-1">
             Real-time telemetry, automated mobile GPS cross-verification, and occupancy monitoring.
-            Operating under strict <span className="text-emerald-700 font-semibold">Flag, Not Block</span> protocol.
+            Operating under strict <span className="text-[--color-accent-600] font-semibold">Flag, Not Block</span> protocol.
           </p>
         </div>
 
@@ -110,8 +113,7 @@ function DashboardPage() {
         <div className="flex items-center gap-2.5">
           <Link
             to="/simulator"
-            className="flex items-center gap-2 px-4 py-2.5 bg-[--color-accent-600] hover:bg-[--color-accent-700] text-white font-bold rounded-xl text-xs md:text-sm transition-[background-color,transform] active:scale-[0.98]"
-            style={{ boxShadow: 'var(--shadow-sm)' }}
+            className="nm-btn flex items-center gap-2 px-4 py-2.5 bg-[--color-accent-500] text-white font-bold rounded-xl text-xs md:text-sm"
           >
             <Radio className="w-4 h-4 text-white" />
             <span>Launch Attendance Simulator</span>
@@ -123,7 +125,7 @@ function DashboardPage() {
       {/* 8 Primary Live KPI Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3">
         {/* Total Students */}
-        <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        <div className="stat-card p-5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-medium text-[--color-text-muted] uppercase tracking-widest">Students</span>
             <Users className="w-4 h-4 text-[--color-text-muted]" />
@@ -133,7 +135,7 @@ function DashboardPage() {
         </div>
 
         {/* Total Buses */}
-        <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        <div className="stat-card p-5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-medium text-[--color-text-muted] uppercase tracking-widest">Fleet Buses</span>
             <BusIcon className="w-4 h-4 text-[--color-text-muted]" />
@@ -143,7 +145,7 @@ function DashboardPage() {
         </div>
 
         {/* Active Trips */}
-        <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        <div className="stat-card p-5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-medium text-[--color-text-muted] uppercase tracking-widest">Active Trips</span>
             <Navigation className="w-4 h-4 text-[--color-accent-500]" />
@@ -153,7 +155,7 @@ function DashboardPage() {
         </div>
 
         {/* Students Onboard */}
-        <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        <div className="stat-card p-5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-medium text-[--color-text-muted] uppercase tracking-widest">Onboard</span>
             <UserCheck className="w-4 h-4 text-[--color-accent-500]" />
@@ -163,7 +165,7 @@ function DashboardPage() {
         </div>
 
         {/* Available Seats */}
-        <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        <div className="stat-card p-5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-medium text-[--color-text-muted] uppercase tracking-widest">Seats Avail</span>
             <TrendingUp className="w-4 h-4 text-[--color-text-muted]" />
@@ -173,7 +175,7 @@ function DashboardPage() {
         </div>
 
         {/* Today's Boardings */}
-        <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        <div className="stat-card p-5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-medium text-[--color-text-muted] uppercase tracking-widest">Boardings</span>
             <UserCheck className="w-4 h-4 text-[--color-accent-500]" />
@@ -183,7 +185,7 @@ function DashboardPage() {
         </div>
 
         {/* Today's Alightings */}
-        <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle]" style={{ boxShadow: 'var(--shadow-sm)' }}>
+        <div className="stat-card p-5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-medium text-[--color-text-muted] uppercase tracking-widest">Alightings</span>
             <UserMinus className="w-4 h-4 text-[--color-text-muted]" />
@@ -195,8 +197,7 @@ function DashboardPage() {
         {/* Pending Verification Alerts */}
         <Link
           to="/reviews"
-          className="bg-[--color-surface-raised] hover:bg-[--color-surface-overlay] p-5 rounded-[--radius-lg] border border-amber-500/30 transition-colors group"
-          style={{ boxShadow: 'var(--shadow-sm)' }}
+          className="stat-card p-5 hover:bg-[--color-surface-overlay] border-amber-500/30 group block transition-colors"
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-medium text-amber-500 uppercase tracking-widest">GPS Flags</span>
@@ -242,7 +243,7 @@ function DashboardPage() {
               return (
                 <div
                   key={route.id}
-                  className="bg-[--color-surface-raised] p-3 rounded-[--radius-md] border border-[--color-border-subtle] text-xs"
+                  className="nm-card p-3 text-xs"
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <span
@@ -267,7 +268,7 @@ function DashboardPage() {
         {/* Right Column: Fleet Occupancy & Transit Curves (4 cols) */}
         <div className="lg:col-span-4 space-y-5">
           {/* Occupancy Card */}
-          <div className="bg-[--color-surface-raised] p-4 rounded-[--radius-lg] border border-[--color-border-subtle]">
+          <div className="nm-card p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-bold text-[--color-text-primary] tracking-wide uppercase">
                 Occupancy by Vehicle
@@ -329,7 +330,7 @@ function DashboardPage() {
           </div>
 
           {/* Transit Volume Curve */}
-          <div className="bg-[--color-surface-raised] p-4 rounded-[--radius-lg] border border-[--color-border-subtle]">
+          <div className="nm-card p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-bold text-[--color-text-primary] tracking-wide uppercase">
                 Attendance Ingress Activity
@@ -356,7 +357,7 @@ function DashboardPage() {
       {/* Recent Tap Events Feed & Pending Reviews Preview */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Recent Activity Ledger (7 cols) */}
-        <div className="lg:col-span-7 bg-[--color-surface-raised] p-4 rounded-[--radius-lg] border border-[--color-border-subtle]">
+        <div className="lg:col-span-7 nm-card p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-[--color-accent-500]" />
@@ -431,7 +432,7 @@ function DashboardPage() {
         </div>
 
         {/* Right: Urgent Review Center Spotlight (5 cols) */}
-        <div className="lg:col-span-5 bg-[--color-surface-raised] p-4 rounded-[--radius-lg] border border-[--color-border-subtle] flex flex-col justify-between">
+        <div className="lg:col-span-5 nm-card p-5 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -464,7 +465,7 @@ function DashboardPage() {
                   return (
                     <div
                       key={verif.id}
-                      className="bg-[--color-surface-overlay] p-3 rounded-lg border border-[--color-flagged]/30 text-xs space-y-1.5"
+                      className="nm-inset p-3 border-[--color-flagged]/30 text-xs space-y-1.5"
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-[--color-text-primary]">{student?.name}</span>
@@ -500,5 +501,6 @@ function DashboardPage() {
         </div>
       </div>
     </div>
+    </RoleGuard>
   )
 }

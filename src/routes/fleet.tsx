@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import {
@@ -36,9 +37,11 @@ function FleetTrackingPage() {
   const currentRoute = routes.find((r) => r.id === selectedBus.currentRouteId)
 
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin']}>
+      <div className="space-y-6 pb-12">
       {/* Header & Controls Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-sm">
+      <div className="nm-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
@@ -58,10 +61,10 @@ function FleetTrackingPage() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <button
             onClick={() => toggleSimulation()}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-[--radius-md] text-xs font-bold transition-colors duration-150 shadow-sm ${
+            className={`nm-btn flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 ${
               isSimulationRunning
                 ? 'bg-[--color-accent-600] text-white'
-                : 'bg-[--color-surface-overlay] text-[--color-text-primary] border border-[--color-border-mid] hover:bg-[--color-surface-float]'
+                : 'bg-[--color-surface-base] text-[--color-text-primary]'
             }`}
           >
             {isSimulationRunning ? (
@@ -77,7 +80,7 @@ function FleetTrackingPage() {
             )}
           </button>
 
-          <div className="flex items-center bg-[--color-surface-overlay] rounded-[--radius-md] border border-[--color-border-mid] p-1">
+          <div className="nm-inset flex items-center p-1.5 gap-1">
             {[1, 2, 5].map((spd) => (
               <button
                 key={spd}
@@ -95,7 +98,7 @@ function FleetTrackingPage() {
 
           <button
             onClick={() => resetToDefault()}
-            className="p-2 rounded-[--radius-md] bg-[--color-surface-overlay] text-[--color-text-muted] hover:text-[--color-danger] border border-[--color-border-mid] transition-colors"
+            className="nm-btn p-2.5 rounded-xl bg-[--color-surface-base] text-[--color-text-muted] hover:text-[--color-danger] transition-colors"
             title="Reset Simulation Positions"
           >
             <RotateCcw className="w-4 h-4" />
@@ -117,7 +120,7 @@ function FleetTrackingPage() {
 
         {/* Selected Bus Telemetry Card (4 cols) */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-md space-y-4">
+          <div className="nm-card p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-[--color-border-subtle] pb-3">
               <div>
                 <span className="text-[10px] font-mono text-[--color-text-muted] uppercase">Selected Vehicle</span>
@@ -138,8 +141,8 @@ function FleetTrackingPage() {
             </div>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 gap-2.5 text-xs">
-              <div className="bg-[--color-surface-overlay] p-2.5 rounded-[--radius-md] border border-[--color-border-subtle]">
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="nm-inset p-3.5">
                 <span className="text-[10px] text-[--color-text-muted] block">Occupancy</span>
                 <span className="text-base font-bold text-[--color-accent-500] font-mono">
                   {selectedBus.currentOccupancy} / {selectedBus.capacity}
@@ -149,7 +152,7 @@ function FleetTrackingPage() {
                 </span>
               </div>
 
-              <div className="bg-[--color-surface-overlay] p-2.5 rounded-[--radius-md] border border-[--color-border-subtle]">
+              <div className="nm-inset p-3.5">
                 <span className="text-[10px] text-[--color-text-muted] block">Current Velocity</span>
                 <span className="text-base font-bold text-sky-400 font-mono">
                   {selectedBus.speed} km/h
@@ -161,8 +164,8 @@ function FleetTrackingPage() {
             </div>
 
             {/* Current Coordinates */}
-            <div className="bg-[--color-surface-overlay] p-3 rounded-[--radius-md] border border-[--color-border-subtle] text-xs space-y-1">
-              <span className="text-[10px] text-[--color-text-muted] uppercase font-mono block">Simulated GPS Coordinates</span>
+            <div className="nm-inset p-4 text-xs space-y-2">
+              <span className="text-[10px] text-[--color-text-muted] uppercase font-mono block mb-1">Simulated GPS Coordinates</span>
               <div className="font-mono text-[--color-text-primary] flex justify-between">
                 <span>Latitude:</span>
                 <span className="text-[--color-accent-500] font-bold">{selectedBus.currentLat}° N</span>
@@ -225,5 +228,6 @@ function FleetTrackingPage() {
         </div>
       </div>
     </div>
+    </RoleGuard>
   )
 }

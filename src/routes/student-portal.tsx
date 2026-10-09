@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import React, { useState, useEffect } from 'react'
 import {
@@ -69,7 +70,9 @@ function StudentPortalPage() {
   const availableSeats = Math.max(0, assignedBus.capacity - assignedBus.currentOccupancy)
 
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin', 'student']}>
+      <div className="space-y-6 pb-12">
       {/* Student Profile Switcher Header */}
       <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -109,7 +112,7 @@ function StudentPortalPage() {
             onChange={(e) => setActiveStudent(e.target.value)}
             className="bg-transparent text-emerald-600 font-bold text-xs focus:outline-none cursor-pointer"
           >
-            {students.slice(0, 15).map((s) => (
+            {students.map((s) => (
               <option key={s.id} value={s.id} className="bg-[--color-surface-raised] text-[--color-text-primary]">
                 {s.name} ({s.regNumber})
               </option>
@@ -315,5 +318,6 @@ function StudentPortalPage() {
         </div>
       </div>
     </div>
+    </RoleGuard>
   )
 }

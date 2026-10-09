@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import {
@@ -39,8 +40,13 @@ function SettingsPage() {
 
   const handleSaveThreshold = () => {
     localStorage.setItem('raksha_proximity_threshold', String(threshold))
-    setSavedMsg(true)
-    setTimeout(() => setSavedMsg(false), 2000)
+    
+    // Dispatch a custom event so other open tabs/components can re-render if needed
+    window.dispatchEvent(new Event('raksha_threshold_updated'))
+
+    import('@/hooks/useToast').then(({ toast }) => {
+      toast.success(`GPS Proximity Threshold updated to ${threshold}m`)
+    })
   }
 
   // Presentation Checklist
@@ -60,7 +66,9 @@ function SettingsPage() {
   ]
 
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin']}>
+      <div className="space-y-6 pb-12">
       {/* Header */}
       <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -260,5 +268,6 @@ function SettingsPage() {
         </div>
       </div>
     </div>
+    </RoleGuard>
   )
 }

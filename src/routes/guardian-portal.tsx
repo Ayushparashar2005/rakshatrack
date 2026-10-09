@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState, useEffect } from 'react'
 import {
@@ -72,7 +73,9 @@ function GuardianPortalPage() {
   }
 
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin', 'guardian']}>
+      <div className="space-y-6 pb-12">
       {/* Header & Ward Selector */}
       <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -99,7 +102,7 @@ function GuardianPortalPage() {
             onChange={(e) => setActiveStudent(e.target.value)}
             className="bg-transparent text-emerald-700 font-bold text-xs focus:outline-none cursor-pointer"
           >
-            {students.slice(0, 15).map((s) => (
+            {students.map((s) => (
               <option key={s.id} value={s.id} className="bg-[--color-surface-raised] text-[--color-text-primary]">
                 {s.name} ({s.guardianName})
               </option>
@@ -298,5 +301,6 @@ function GuardianPortalPage() {
         </div>
       </div>
     </div>
+    </RoleGuard>
   )
 }

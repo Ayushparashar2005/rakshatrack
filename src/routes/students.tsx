@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import {
@@ -25,7 +26,7 @@ export const Route = createFileRoute('/students')({
 })
 
 function StudentManagementPage() {
-  const { students, buses, routes } = useDemoStore()
+  const { students, buses, routes, updateStudent } = useDemoStore()
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedRouteFilter, setSelectedRouteFilter] = useState<string>('all')
@@ -62,11 +63,14 @@ function StudentManagementPage() {
 
   const saveEdit = () => {
     if (!editingStudent) return
+    
     // In our live store, update student
-    editingStudent.cardUid = editCardUid
-    editingStudent.assignedBusId = editBusId
-    editingStudent.assignedRouteId = editRouteId
-    editingStudent.isEligible = editEligible
+    updateStudent(editingStudent.id, {
+      cardUid: editCardUid,
+      assignedBusId: editBusId,
+      assignedRouteId: editRouteId,
+      isEligible: editEligible,
+    })
 
     // Persist changes to Neon DB
     updateStudentInDB({
@@ -77,13 +81,23 @@ function StudentManagementPage() {
         assignedRouteId: editRouteId,
         isEligible: editEligible,
       },
+    }).then(res => {
+      if (!res.success) {
+        console.warn('Failed to sync student to Neon DB')
+      }
     }).catch(console.warn)
+
+    import('@/hooks/useToast').then(({ toast }) => {
+      toast.success(`${editingStudent.name}'s pass updated`)
+    })
 
     setEditingStudent(null)
   }
 
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin']}>
+      <div className="space-y-6 pb-12">
       {/* Header */}
       <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -318,5 +332,6 @@ function StudentManagementPage() {
         </div>
       )}
     </div>
+    </RoleGuard>
   )
 }

@@ -1,3 +1,4 @@
+import { RoleGuard } from '@/components/layout/RoleGuard'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState, useEffect } from 'react'
 import {
@@ -124,7 +125,9 @@ function RouteRequestsPage() {
   }
 
   return (
-    <div className="space-y-6 pb-12">
+    
+    <RoleGuard allowedRoles={['admin', 'student']}>
+      <div className="space-y-6 pb-12">
       {/* Header */}
       <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -322,5 +325,6 @@ function RouteRequestsPage() {
         </div>
       )}
     </div>
+    </RoleGuard>
   )
 }
