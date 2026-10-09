@@ -41,15 +41,15 @@ function FleetTrackingPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-sm">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
               GPS Telemetry Feed
             </span>
-            <span className="text-xs text-slate-400 font-mono">Simulated Coordinates</span>
+            <span className="text-xs text-[--color-text-muted] font-mono">Simulated Coordinates</span>
           </div>
-          <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-[--color-text-primary] tracking-tight flex items-center gap-2">
             <span>Fleet Tracking & Vehicle Telemetry Console</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[--color-text-muted] mt-1">
             Real-time tracking of all 4 SGT University transport buses along NCR corridors.
           </p>
         </div>
@@ -60,13 +60,13 @@ function FleetTrackingPage() {
             onClick={() => toggleSimulation()}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-[--radius-md] text-xs font-bold transition-colors duration-150 shadow-sm ${
               isSimulationRunning
-                ? 'bg-[--color-accent-500] text-slate-950'
+                ? 'bg-[--color-accent-600] text-white'
                 : 'bg-[--color-surface-overlay] text-[--color-text-primary] border border-[--color-border-mid] hover:bg-[--color-surface-float]'
             }`}
           >
             {isSimulationRunning ? (
               <>
-                <Pause className="w-4 h-4 fill-slate-950" />
+                <Pause className="w-4 h-4 fill-white" />
                 <span>Pause Movement</span>
               </>
             ) : (
@@ -84,7 +84,7 @@ function FleetTrackingPage() {
                 onClick={() => setSimulationSpeed(spd)}
                 className={`px-2.5 py-1 rounded-[--radius-sm] text-xs font-mono font-bold transition-colors ${
                   simulationSpeed === spd
-                    ? 'bg-[--color-accent-500] text-slate-950'
+                    ? 'bg-[--color-accent-600] text-white'
                     : 'text-[--color-text-muted] hover:text-[--color-text-primary]'
                 }`}
               >

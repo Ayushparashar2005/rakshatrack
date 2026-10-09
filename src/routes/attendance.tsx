@@ -68,22 +68,22 @@ function AttendanceHistoryPage() {
       <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
               Immutable Transit Ledger
             </span>
-            <span className="text-xs text-slate-400 font-mono">SGT University Bus RFID</span>
+            <span className="text-xs text-[--color-text-muted] font-mono">SGT University Bus RFID</span>
           </div>
-          <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-[--color-text-primary] tracking-tight flex items-center gap-2">
             <span>Attendance Audit Ledger & History</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[--color-text-muted] mt-1">
             Complete record of boarding and alighting transitions with mobile GPS cross-verification outcomes.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-slate-300 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
-            Total Records: <b className="text-emerald-400">{tapEvents.length}</b>
+          <span className="text-xs font-mono text-[--color-text-secondary] bg-[--color-surface-sunken] border border-[--color-border-subtle] px-3 py-1.5 rounded-xl">
+            Total Records: <b className="text-emerald-700">{tapEvents.length}</b>
           </span>
         </div>
       </div>
@@ -184,18 +184,18 @@ function AttendanceHistoryPage() {
                               : 'hover:bg-[--color-surface-overlay]'
                           }`}
                         >
-                          <td className="py-3 px-3.5 font-mono text-slate-400 font-medium">
+                          <td className="py-3 px-3.5 font-mono text-[--color-text-muted] font-medium">
                             {tap.id}
                           </td>
                           <td className="py-3 px-3.5">
-                            <div className="font-semibold text-slate-200">{student?.name}</div>
-                            <div className="text-[10px] text-slate-400 font-mono">
+                            <div className="font-semibold text-[--color-text-primary]">{student?.name}</div>
+                            <div className="text-[10px] text-[--color-text-muted] font-mono">
                               {student?.regNumber} • Card: {tap.cardUid}
                             </div>
                           </td>
                           <td className="py-3 px-3.5">
-                            <div className="font-semibold text-slate-200">{bus?.busNumber}</div>
-                            <div className="text-[10px] text-slate-400 truncate max-w-[130px]">
+                            <div className="font-semibold text-[--color-text-primary]">{bus?.busNumber}</div>
+                            <div className="text-[10px] text-[--color-text-muted] truncate max-w-[130px]">
                               {tap.stopName}
                             </div>
                           </td>
@@ -203,25 +203,25 @@ function AttendanceHistoryPage() {
                             <span
                               className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                                 tap.type === 'boarding'
-                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                  : 'bg-slate-800 text-slate-300 border border-slate-700'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
+                                  : 'bg-[--color-surface-sunken] text-[--color-text-secondary] border border-[--color-border-subtle]'
                               }`}
                             >
                               {tap.type}
                             </span>
                           </td>
-                          <td className="py-3 px-3.5 font-mono text-slate-300 text-[11px]">
+                          <td className="py-3 px-3.5 font-mono text-[--color-text-secondary] text-[11px]">
                             <div>{formatTime(tap.timestamp)}</div>
-                            <div className="text-[9px] text-slate-500">{formatDate(tap.timestamp)}</div>
+                            <div className="text-[9px] text-[--color-text-muted]">{formatDate(tap.timestamp)}</div>
                           </td>
                           <td className="py-3 px-3.5">
                             <span
                               className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase ${
                                 tap.verificationStatus === 'verified'
-                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
                                   : tap.verificationStatus === 'flagged'
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                                  : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                                  ? 'bg-amber-50 text-amber-700 border border-amber-300'
+                                  : 'bg-purple-50 text-purple-700 border border-purple-300'
                               }`}
                             >
                               {tap.verificationStatus}
@@ -233,7 +233,7 @@ function AttendanceHistoryPage() {
                                 e.stopPropagation()
                                 setSelectedEventId(tap.id)
                               }}
-                              className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold"
+                              className="text-xs text-[--color-accent-600] hover:text-[--color-accent-700] font-semibold"
                             >
                               Inspect →
                             </button>
@@ -253,44 +253,44 @@ function AttendanceHistoryPage() {
           <div className="lg:col-span-4 bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-md space-y-4">
             <div className="flex items-center justify-between border-b border-[--color-border-subtle] pb-3">
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-mono font-bold text-slate-200 uppercase">
+                <Shield className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-xs font-mono font-bold text-[--color-text-primary] uppercase">
                   Event Verification Evidence
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedEventId(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg"
+                className="text-[--color-text-muted] hover:text-[--color-text-primary] p-1 rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Event Summary Pill */}
-            <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-800 text-xs space-y-1.5">
+            <div className="bg-[--color-surface-sunken] p-3 rounded-[--radius-md] border border-[--color-border-subtle] text-xs space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-slate-400">Event ID:</span>
-                <span className="font-mono text-slate-200 font-bold">{selectedTap.id}</span>
+                <span className="text-[--color-text-muted]">Event ID:</span>
+                <span className="font-mono text-[--color-text-primary] font-bold">{selectedTap.id}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Student:</span>
-                <span className="text-slate-200 font-semibold">{selectedStudent?.name}</span>
+                <span className="text-[--color-text-muted]">Student:</span>
+                <span className="text-[--color-text-primary] font-semibold">{selectedStudent?.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Registration:</span>
-                <span className="font-mono text-slate-200">{selectedStudent?.regNumber}</span>
+                <span className="text-[--color-text-muted]">Registration:</span>
+                <span className="font-mono text-[--color-text-primary]">{selectedStudent?.regNumber}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Card UID:</span>
-                <span className="font-mono text-emerald-400">{selectedTap.cardUid}</span>
+                <span className="text-[--color-text-muted]">Card UID:</span>
+                <span className="font-mono text-emerald-700 font-semibold">{selectedTap.cardUid}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Action:</span>
-                <span className="font-bold uppercase text-slate-200">{selectedTap.type}</span>
+                <span className="text-[--color-text-muted]">Action:</span>
+                <span className="font-bold uppercase text-[--color-text-primary]">{selectedTap.type}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Bus & Stoppage:</span>
-                <span className="text-slate-200">{selectedBus?.busNumber} ({selectedTap.stopName})</span>
+                <span className="text-[--color-text-muted]">Bus & Stoppage:</span>
+                <span className="text-[--color-text-primary]">{selectedBus?.busNumber} ({selectedTap.stopName})</span>
               </div>
             </div>
 
@@ -299,35 +299,35 @@ function AttendanceHistoryPage() {
               <div
                 className={`p-4 rounded-xl border text-xs space-y-2.5 ${
                   selectedVerification.status === 'verified'
-                    ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
+                    ? 'bg-emerald-50/80 border-emerald-200 text-emerald-800'
                     : selectedVerification.status === 'flagged'
-                    ? 'bg-amber-950/40 border-amber-500/40 text-amber-300'
-                    : 'bg-purple-950/40 border-purple-500/40 text-purple-300'
+                    ? 'bg-amber-50/80 border-amber-200 text-amber-800'
+                    : 'bg-purple-50/80 border-purple-200 text-purple-800'
                 }`}
               >
                 <div className="flex items-center justify-between font-bold text-sm">
                   <div className="flex items-center gap-1.5">
                     {selectedVerification.status === 'verified' ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     ) : (
-                      <AlertTriangle className="w-4 h-4 text-amber-400" />
+                      <AlertTriangle className="w-4 h-4 text-amber-600" />
                     )}
                     <span className="uppercase">{selectedVerification.status}</span>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/40">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/5 border border-black/10">
                     {selectedVerification.scenario}
                   </span>
                 </div>
 
-                <div className="text-[11px] leading-relaxed text-slate-200">
+                <div className="text-[11px] leading-relaxed text-[--color-text-secondary]">
                   {selectedVerification.explanation}
                 </div>
 
                 {/* Haversine distance math display */}
-                <div className="pt-2 border-t border-white/10 space-y-1 font-mono text-[10px] text-slate-300">
+                <div className="pt-2 border-t border-[--color-border-subtle] space-y-1 font-mono text-[10px] text-[--color-text-secondary]">
                   <div className="flex justify-between">
                     <span>Haversine Distance:</span>
-                    <span className="font-bold text-white">
+                    <span className="font-bold text-[--color-text-primary]">
                       {selectedVerification.distanceMeters >= 0
                         ? `${selectedVerification.distanceMeters} meters`
                         : 'No GPS stream'}
@@ -335,11 +335,11 @@ function AttendanceHistoryPage() {
                   </div>
                   <div className="flex justify-between">
                     <span>Configured Max Threshold:</span>
-                    <span className="text-white">150 meters</span>
+                    <span className="text-[--color-text-primary]">150 meters</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Student Phone Telemetry:</span>
-                    <span className="text-white">
+                    <span className="text-[--color-text-primary]">
                       {selectedVerification.studentLat
                         ? `${selectedVerification.studentLat}, ${selectedVerification.studentLng}`
                         : 'Unavailable'}
@@ -347,7 +347,7 @@ function AttendanceHistoryPage() {
                   </div>
                   <div className="flex justify-between">
                     <span>Vehicle Reader GPS:</span>
-                    <span className="text-white">
+                    <span className="text-[--color-text-primary]">
                       {selectedVerification.busLat}, {selectedVerification.busLng}
                     </span>
                   </div>

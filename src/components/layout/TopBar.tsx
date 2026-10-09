@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/tanstack-react-start'
+import { Show, SignInButton, SignUpButton, UserButton, useUser } from '@clerk/tanstack-react-start'
 import {
   Menu,
   Bell,
@@ -11,8 +11,10 @@ import {
   Shield,
   Activity,
   CheckCircle,
+  UserCheck,
 } from 'lucide-react'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
+import { getRoleFromUser, syncUserOnSignIn } from '@/lib/auth'
 
 interface TopBarProps {
   onToggleMobileMenu: () => void
@@ -21,8 +23,18 @@ interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({ onToggleMobileMenu }) => {
   const routerState = useRouterState()
   const pathname = routerState.location.pathname
-  const { isSimulationRunning, alerts, currentRole } = useDemoStore()
+  const { isSimulationRunning, alerts, currentRole, setRole } = useDemoStore()
+  const { user, isLoaded, isSignedIn } = useUser()
   const [timeStr, setTimeStr] = useState<string>('')
+
+  // Sync Clerk authenticated user with Neon DB and role state
+  useEffect(() => {
+    if (isSignedIn && user) {
+      const activeRole = getRoleFromUser(user)
+      setRole(activeRole)
+      syncUserOnSignIn(user)
+    }
+  }, [isSignedIn, user?.id])
 
   useEffect(() => {
     const updateTime = () => {
@@ -157,7 +169,21 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobileMenu }) => {
             </SignUpButton>
           </Show>
           <Show when="signed-in">
-            <UserButton />
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border font-mono ${
+                  currentRole === 'admin'
+                    ? 'bg-amber-500/10 text-amber-600 border-amber-500/30'
+                    : currentRole === 'guardian'
+                    ? 'bg-purple-500/10 text-purple-600 border-purple-500/30'
+                    : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30'
+                }`}
+                title={`Logged in role: ${currentRole}`}
+              >
+                {currentRole}
+              </span>
+              <UserButton />
+            </div>
           </Show>
         </div>
       </div>

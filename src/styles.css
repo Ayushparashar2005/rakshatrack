@@ -1,9 +1,6 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-@import "tailwindcss";
-@import "leaflet/dist/leaflet.css";
-
 @theme {
   /* ── Surfaces (light, elevation by lightness) ─────────────────── */
   --color-surface-base:     oklch(0.97 0.01 250);    /* background */
@@ -101,10 +98,10 @@
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: oklch(1 0 0 / 0.10);
+  background: oklch(0 0 0 / 0.14);
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover { background: oklch(1 0 0 / 0.18); }
+::-webkit-scrollbar-thumb:hover { background: oklch(0 0 0 / 0.24); }
 
 /* Radar pulse — RFID simulator only, on bus markers */
 @keyframes radar-pulse {

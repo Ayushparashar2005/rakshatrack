@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Bell,
   AlertTriangle,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
 import { formatRelativeTime } from '@/lib/utils'
+import { getSystemAlertsFromDB, markAlertReadInDB } from '@/lib/db/actions'
 
 export const Route = createFileRoute('/alerts')({
   component: AlertsCenterPage,
@@ -22,29 +23,60 @@ export const Route = createFileRoute('/alerts')({
 function AlertsCenterPage() {
   const { alerts, markAlertRead, markAllAlertsRead } = useDemoStore()
   const [filterSeverity, setFilterSeverity] = useState<string>('all')
+  const [dbAlerts, setDbAlerts] = useState<any[]>([])
 
-  const filteredAlerts = alerts.filter((a) => {
+  useEffect(() => {
+    getSystemAlertsFromDB()
+      .then((records) => {
+        if (Array.isArray(records)) {
+          setDbAlerts(records)
+        }
+      })
+      .catch((err) => console.warn('Failed to fetch DB alerts:', err))
+  }, [alerts.length])
+
+  // Merge in-memory and DB alerts
+  const combinedAlerts = [...alerts]
+  for (const da of dbAlerts) {
+    if (!combinedAlerts.some((a) => a.id === da.id)) {
+      combinedAlerts.push(da)
+    }
+  }
+
+  const filteredAlerts = combinedAlerts.filter((a) => {
     if (filterSeverity === 'all') return true
     return a.severity === filterSeverity
   })
 
-  const unreadCount = alerts.filter((a) => !a.isRead).length
+  const unreadCount = combinedAlerts.filter((a) => !a.isRead).length
+
+  const handleMarkRead = (id: string) => {
+    markAlertRead(id)
+    markAlertReadInDB({ data: { alertId: id } }).catch(console.warn)
+  }
+
+  const handleMarkAllRead = () => {
+    markAllAlertsRead()
+    combinedAlerts.forEach((a) => {
+      markAlertReadInDB({ data: { alertId: a.id } }).catch(console.warn)
+    })
+  }
 
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="bg-[#101726] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full font-mono">
               Transit Safety Dispatch
             </span>
-            <span className="text-xs text-slate-400 font-mono">Real-Time Incident Stream</span>
+            <span className="text-xs text-[--color-text-muted] font-mono">Real-Time Incident Stream</span>
           </div>
-          <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-[--color-text-primary] tracking-tight flex items-center gap-2">
             <span>Safety Alerts & Incident Feed</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[--color-text-secondary] mt-1">
             Automated notifications for GPS proximity flags, capacity violations, and sensor connectivity alerts.
           </p>
         </div>
@@ -52,10 +84,10 @@ function AlertsCenterPage() {
         <div className="flex items-center gap-3">
           {unreadCount > 0 && (
             <button
-              onClick={() => markAllAlertsRead()}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700"
+              onClick={handleMarkAllRead}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[--color-surface-base] hover:bg-[--color-surface-overlay] text-[--color-text-primary] text-xs font-semibold border border-[--color-border-mid] shadow-xs"
             >
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
               <span>Mark All as Read ({unreadCount})</span>
             </button>
           )}
@@ -70,11 +102,11 @@ function AlertsCenterPage() {
             onClick={() => setFilterSeverity(sev)}
             className={`px-3 py-1.5 rounded-xl capitalize font-semibold transition-colors ${
               filterSeverity === sev
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'
+                ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                : 'bg-[--color-surface-raised] border border-[--color-border-subtle] text-[--color-text-secondary] hover:text-[--color-text-primary]'
             }`}
           >
-            {sev} ({sev === 'all' ? alerts.length : alerts.filter((a) => a.severity === sev).length})
+            {sev} ({sev === 'all' ? combinedAlerts.length : combinedAlerts.filter((a) => a.severity === sev).length})
           </button>
         ))}
       </div>
@@ -82,7 +114,7 @@ function AlertsCenterPage() {
       {/* Alerts Feed */}
       <div className="space-y-3">
         {filteredAlerts.length === 0 ? (
-          <div className="bg-[#101726] p-12 rounded-2xl border border-slate-800 text-center text-xs text-slate-500">
+          <div className="bg-[--color-surface-raised] p-12 rounded-2xl border border-[--color-border-subtle] text-center text-xs text-[--color-text-muted]">
             No incident alerts logged under this category.
           </div>
         ) : (
@@ -91,18 +123,18 @@ function AlertsCenterPage() {
               key={alert.id}
               className={`p-4 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
                 !alert.isRead
-                  ? 'bg-[#151c2d] border-emerald-500/30 shadow-lg'
-                  : 'bg-[#101726] border-slate-800 opacity-80'
+                  ? 'bg-[--color-surface-raised] border-emerald-400 shadow-sm'
+                  : 'bg-[--color-surface-base] border-[--color-border-subtle] opacity-85'
               }`}
             >
               <div className="flex items-start gap-3.5">
                 <div
                   className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${
                     alert.severity === 'warning'
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
                       : alert.severity === 'critical'
-                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                      : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                      ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                      : 'bg-sky-50 text-sky-700 border border-sky-200'
                   }`}
                 >
                   {alert.severity === 'warning' ? (
@@ -116,13 +148,13 @@ function AlertsCenterPage() {
 
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-bold text-white">{alert.title}</h4>
+                    <h4 className="text-sm font-bold text-[--color-text-primary]">{alert.title}</h4>
                     {!alert.isRead && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-300">{alert.message}</p>
-                  <div className="flex items-center gap-3 text-[11px] text-slate-400 font-mono pt-1">
+                  <p className="text-xs text-[--color-text-secondary]">{alert.message}</p>
+                  <div className="flex items-center gap-3 text-[11px] text-[--color-text-muted] font-mono pt-1">
                     <span>{formatRelativeTime(alert.timestamp)}</span>
                     {alert.busNumber && <span>Vehicle: {alert.busNumber}</span>}
                     {alert.studentName && <span>Student: {alert.studentName}</span>}
@@ -132,8 +164,8 @@ function AlertsCenterPage() {
 
               {!alert.isRead && (
                 <button
-                  onClick={() => markAlertRead(alert.id)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold self-start md:self-center flex-shrink-0"
+                  onClick={() => handleMarkRead(alert.id)}
+                  className="px-3 py-1.5 rounded-lg bg-[--color-surface-base] hover:bg-[--color-surface-overlay] text-[--color-text-primary] border border-[--color-border-mid] text-xs font-semibold self-start md:self-center flex-shrink-0 shadow-xs"
                 >
                   Acknowledge
                 </button>

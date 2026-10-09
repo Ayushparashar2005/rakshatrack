@@ -21,6 +21,7 @@ import {
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
 import type { EventType, VerificationEvidence, TapEvent } from '@/lib/types'
 import { formatRelativeTime } from '@/lib/utils'
+import { persistTapEvent, persistVerification } from '@/lib/db/actions'
 
 export const Route = createFileRoute('/simulator')({
   component: AttendanceSimulatorPage,
@@ -75,7 +76,7 @@ function AttendanceSimulatorPage() {
     await new Promise((r) => setTimeout(r, 550))
 
     // Step 4: Ledger Recording & Occupancy Update
-    setProcessingStep('4/4: Committing Event to Transit Audit Ledger…')
+    setProcessingStep('4/4: Committing Event to Transit Audit Ledger & Neon DB…')
     await new Promise((r) => setTimeout(r, 400))
 
     try {
@@ -92,6 +93,41 @@ function AttendanceSimulatorPage() {
         verification: outcome.verification,
         message: outcome.message,
       })
+
+      // Wire live persistence to Neon PostgreSQL Database
+      persistTapEvent({
+        data: {
+          id: outcome.tapEvent.id,
+          cardUid: outcome.tapEvent.cardUid,
+          studentId: outcome.tapEvent.studentId,
+          busId: outcome.tapEvent.busId,
+          tripId: outcome.tapEvent.tripId,
+          type: outcome.tapEvent.type,
+          timestamp: outcome.tapEvent.timestamp,
+          simulated: outcome.tapEvent.simulated,
+          verificationStatus: outcome.tapEvent.verificationStatus,
+          stopName: outcome.tapEvent.stopName,
+        },
+      }).catch((err) => console.warn('Tap event Neon DB persistence notice:', err))
+
+      if (outcome.verification) {
+        persistVerification({
+          data: {
+            id: outcome.verification.id,
+            tapEventId: outcome.verification.tapEventId,
+            status: outcome.verification.status,
+            distanceMeters: outcome.verification.distanceMeters,
+            studentLat: outcome.verification.studentLat,
+            studentLng: outcome.verification.studentLng,
+            busLat: outcome.verification.busLat,
+            busLng: outcome.verification.busLng,
+            scenario: outcome.verification.scenario,
+            evidenceQuality: outcome.verification.evidenceQuality,
+            explanation: outcome.verification.explanation,
+            reviewStatus: outcome.verification.reviewStatus,
+          },
+        }).catch((err) => console.warn('Verification Neon DB persistence notice:', err))
+      }
     } catch (err: any) {
       alert(`Simulation Error: ${err.message}`)
     } finally {
@@ -107,23 +143,23 @@ function AttendanceSimulatorPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-mono">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
                 Hardware-Free Simulation Console
               </span>
-              <span className="text-xs text-slate-400 font-mono">ISO 14443-A Emulation</span>
+              <span className="text-xs text-[--color-text-muted] font-mono">ISO 14443-A Emulation</span>
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
+            <h2 className="text-xl md:text-2xl font-bold text-[--color-text-primary] tracking-tight flex items-center gap-2.5">
               <span>Software-Only RFID Attendance Simulator</span>
             </h2>
-            <p className="text-xs md:text-sm text-slate-400 max-w-3xl mt-1">
+            <p className="text-xs md:text-sm text-[--color-text-secondary] max-w-3xl mt-1">
               This interactive console replicates vehicle-mounted contactless RFID card readers and automated student phone GPS telemetry.
               All business logic, transitions, and verification policies run through the live production engine.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1.5 bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-lg flex items-center gap-1.5 font-mono">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="px-3 py-1.5 bg-[--color-surface-base] border border-[--color-border-mid] text-xs text-[--color-text-secondary] rounded-lg flex items-center gap-1.5 font-mono">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Reader Online: BUS-MOUNTED-V3
             </span>
           </div>
@@ -135,23 +171,23 @@ function AttendanceSimulatorPage() {
         {/* Left Column: Form Controls (7 cols) */}
         <div className="lg:col-span-7 space-y-5">
           <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] space-y-5" style={{ boxShadow: 'var(--shadow-sm)' }}>
-            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <Radio className="w-4 h-4 text-emerald-400" />
+            <h3 className="text-sm font-bold text-[--color-text-primary] uppercase tracking-wider flex items-center gap-2">
+              <Radio className="w-4 h-4 text-emerald-600" />
               <span>1. Configure Simulated Tap Scenario</span>
             </h3>
 
             {/* Student Selector */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-[--color-text-secondary] mb-1.5">
                 Select Student & RFID Card
               </label>
               <select
                 value={selectedStudentId}
                 onChange={(e) => setSelectedStudentId(e.target.value)}
-                className="w-full bg-[#090d16] border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-medium focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full bg-[--color-surface-base] border border-[--color-border-mid] rounded-xl px-3.5 py-2.5 text-xs text-[--color-text-primary] font-medium focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               >
                 {students.map((student) => (
-                  <option key={student.id} value={student.id} className="bg-slate-900 text-white">
+                  <option key={student.id} value={student.id} className="bg-[--color-surface-raised] text-[--color-text-primary]">
                     {student.name} ({student.regNumber}) — Card: {student.cardUid} [{student.currentBoardingState.toUpperCase()}]
                   </option>
                 ))}
@@ -159,26 +195,26 @@ function AttendanceSimulatorPage() {
 
               {/* Student Details Card */}
               {selectedStudent && (
-                <div className="mt-2.5 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="mt-2.5 p-3 rounded-xl bg-[--color-surface-base] border border-[--color-border-subtle] text-xs grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <div>
-                    <span className="text-[10px] text-slate-400 block">Department</span>
-                    <span className="font-semibold text-slate-200 truncate block">
+                    <span className="text-[10px] text-[--color-text-muted] block">Department</span>
+                    <span className="font-semibold text-[--color-text-primary] truncate block">
                       {selectedStudent.department.split(' ')[0]}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 block">RFID UID</span>
-                    <span className="font-mono text-emerald-400 font-bold block">
+                    <span className="text-[10px] text-[--color-text-muted] block">RFID UID</span>
+                    <span className="font-mono text-emerald-600 font-bold block">
                       {selectedStudent.cardUid}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 block">Boarding State</span>
+                    <span className="text-[10px] text-[--color-text-muted] block">Boarding State</span>
                     <span
                       className={`font-semibold block ${
                         selectedStudent.currentBoardingState === 'boarded'
-                          ? 'text-emerald-400'
-                          : 'text-slate-400'
+                          ? 'text-emerald-600'
+                          : 'text-[--color-text-muted]'
                       }`}
                     >
                       {selectedStudent.currentBoardingState === 'boarded'
@@ -187,8 +223,8 @@ function AttendanceSimulatorPage() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 block">Assigned Bus</span>
-                    <span className="font-semibold text-slate-200 block">
+                    <span className="text-[10px] text-[--color-text-muted] block">Assigned Bus</span>
+                    <span className="font-semibold text-[--color-text-primary] block">
                       {buses.find((b) => b.id === selectedStudent.assignedBusId)?.busNumber || 'BUS-101'}
                     </span>
                   </div>
@@ -200,28 +236,28 @@ function AttendanceSimulatorPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Bus Selector */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[--color-text-secondary] mb-1.5">
                   Select Vehicle & RFID Reader
                 </label>
                 <select
                   value={selectedBusId}
                   onChange={(e) => setSelectedBusId(e.target.value)}
-                  className="w-full bg-[#090d16] border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-medium focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[--color-surface-base] border border-[--color-border-mid] rounded-xl px-3.5 py-2.5 text-xs text-[--color-text-primary] font-medium focus:outline-none focus:border-emerald-500"
                 >
                   {buses.map((bus) => (
-                    <option key={bus.id} value={bus.id} className="bg-slate-900 text-white">
+                    <option key={bus.id} value={bus.id} className="bg-[--color-surface-raised] text-[--color-text-primary]">
                       {bus.busNumber} ({bus.plateNumber}) — {bus.currentOccupancy}/{bus.capacity} seats
                     </option>
                   ))}
                 </select>
-                <span className="text-[10px] text-slate-400 mt-1 block">
+                <span className="text-[10px] text-[--color-text-muted] mt-1 block">
                   Route: {assignedRoute?.name} ({selectedBus.speed} km/h)
                 </span>
               </div>
 
               {/* Event Type: Boarding or Alighting */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[--color-text-secondary] mb-1.5">
                   Transit Event Type
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -230,8 +266,8 @@ function AttendanceSimulatorPage() {
                     onClick={() => setEventType('boarding')}
                     className={`py-2 px-3 rounded-[--radius-md] border text-xs font-bold transition-colors duration-150 ${
                       eventType === 'boarding'
-                        ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-md shadow-emerald-950'
-                        : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200'
+                        ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm'
+                        : 'bg-[--color-surface-sunken] border-[--color-border-mid] text-[--color-text-muted] hover:text-[--color-text-primary]'
                     }`}
                   >
                     ↑ BOARDING (IN)
@@ -241,8 +277,8 @@ function AttendanceSimulatorPage() {
                     onClick={() => setEventType('alighting')}
                     className={`py-2 px-3 rounded-[--radius-md] border text-xs font-bold transition-colors duration-150 ${
                       eventType === 'alighting'
-                        ? 'bg-sky-500/20 border-sky-500 text-sky-300 shadow-md shadow-sky-950'
-                        : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-slate-200'
+                        ? 'bg-sky-50 border-sky-500 text-sky-700 shadow-sm'
+                        : 'bg-[--color-surface-sunken] border-[--color-border-mid] text-[--color-text-muted] hover:text-[--color-text-primary]'
                     }`}
                   >
                     ↓ ALIGHTING (OUT)
@@ -253,7 +289,7 @@ function AttendanceSimulatorPage() {
 
             {/* GPS Verification Scenario Selector */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold text-[--color-text-secondary] mb-1.5">
                 GPS Cross-Verification Test Scenario
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -263,19 +299,19 @@ function AttendanceSimulatorPage() {
                   onClick={() => setScenario('A')}
                   className={`p-3 rounded-[--radius-md] border text-left transition-colors duration-150 ${
                     scenario === 'A'
-                      ? 'bg-emerald-950/40 border-emerald-500 text-emerald-300 shadow-md'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                      ? 'bg-emerald-50 border-emerald-500 text-emerald-900 shadow-sm'
+                      : 'bg-[--color-surface-base] border-[--color-border-mid] text-[--color-text-secondary] hover:text-[--color-text-primary]'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 font-bold text-xs">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Scenario A</span>
                   </div>
-                  <div className="text-[11px] font-semibold text-emerald-300 mt-0.5">
+                  <div className="text-[11px] font-semibold text-emerald-700 mt-0.5">
                     Student Near Bus
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-1">
-                    Phone GPS ~38m from bus. Result: <b className="text-emerald-400">VERIFIED</b>
+                  <div className="text-[10px] text-[--color-text-muted] mt-1">
+                    Phone GPS ~38m from bus. Result: <b className="text-emerald-700">VERIFIED</b>
                   </div>
                 </button>
 
@@ -285,19 +321,19 @@ function AttendanceSimulatorPage() {
                   onClick={() => setScenario('B')}
                   className={`p-3 rounded-[--radius-md] border text-left transition-colors duration-150 ${
                     scenario === 'B'
-                      ? 'bg-amber-950/40 border-amber-500 text-amber-300 shadow-md'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                      ? 'bg-amber-50 border-amber-500 text-amber-900 shadow-sm'
+                      : 'bg-[--color-surface-base] border-[--color-border-mid] text-[--color-text-secondary] hover:text-[--color-text-primary]'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 font-bold text-xs">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
                     <span>Scenario B</span>
                   </div>
-                  <div className="text-[11px] font-semibold text-amber-300 mt-0.5">
+                  <div className="text-[11px] font-semibold text-amber-700 mt-0.5">
                     Student Far from Bus
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-1">
-                    Phone GPS ~1.1km away. Result: <b className="text-amber-400">FLAGGED</b>
+                  <div className="text-[10px] text-[--color-text-muted] mt-1">
+                    Phone GPS ~1.1km away. Result: <b className="text-amber-700">FLAGGED</b>
                   </div>
                 </button>
 
@@ -307,32 +343,32 @@ function AttendanceSimulatorPage() {
                   onClick={() => setScenario('C')}
                   className={`p-3 rounded-[--radius-md] border text-left transition-colors duration-150 ${
                     scenario === 'C'
-                      ? 'bg-purple-950/40 border-purple-500 text-purple-300 shadow-md'
-                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                      ? 'bg-purple-50 border-purple-500 text-purple-900 shadow-sm'
+                      : 'bg-[--color-surface-base] border-[--color-border-mid] text-[--color-text-secondary] hover:text-[--color-text-primary]'
                   }`}
                 >
                   <div className="flex items-center gap-1.5 font-bold text-xs">
-                    <HelpCircle className="w-3.5 h-3.5 text-purple-400" />
+                    <HelpCircle className="w-3.5 h-3.5 text-purple-600" />
                     <span>Scenario C</span>
                   </div>
-                  <div className="text-[11px] font-semibold text-purple-300 mt-0.5">
+                  <div className="text-[11px] font-semibold text-purple-700 mt-0.5">
                     GPS Unavailable
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-1">
-                    Phone offline / stale. Result: <b className="text-purple-400">UNVERIFIED</b>
+                  <div className="text-[10px] text-[--color-text-muted] mt-1">
+                    Phone offline / stale. Result: <b className="text-purple-700">UNVERIFIED</b>
                   </div>
                 </button>
               </div>
 
               {/* Scenario Explanation alert */}
-              <div className="mt-2.5 p-2.5 rounded-lg bg-slate-900/90 border border-slate-800 text-[11px] text-slate-400 flex items-start gap-2">
-                <Info className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <div className="mt-2.5 p-2.5 rounded-lg bg-[--color-surface-base] border border-[--color-border-mid] text-[11px] text-[--color-text-secondary] flex items-start gap-2">
+                <Info className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-semibold text-slate-300">Policy Reminder:</span> Regardless of whether
-                  GPS returns <span className="text-emerald-400 font-bold">VERIFIED</span>,{' '}
-                  <span className="text-amber-400 font-bold">FLAGGED</span>, or{' '}
-                  <span className="text-purple-400 font-bold">UNVERIFIED</span>, the attendance event is{' '}
-                  <span className="text-white font-semibold">always registered</span>. The student is not locked out;
+                  <span className="font-semibold text-[--color-text-primary]">Policy Reminder:</span> Regardless of whether
+                  GPS returns <span className="text-emerald-700 font-bold">VERIFIED</span>,{' '}
+                  <span className="text-amber-700 font-bold">FLAGGED</span>, or{' '}
+                  <span className="text-purple-700 font-bold">UNVERIFIED</span>, the attendance event is{' '}
+                  <span className="text-[--color-text-primary] font-semibold">always registered</span>. The student is not locked out;
                   flags are routed to the administrative audit queue.
                 </div>
               </div>
@@ -346,14 +382,14 @@ function AttendanceSimulatorPage() {
                 disabled={isProcessing}
                 className={`w-full py-4 px-6 rounded-[--radius-lg] font-black text-sm md:text-base tracking-wider uppercase transition-[background-color,transform,box-shadow,border-color,opacity] duration-150 flex items-center justify-center gap-3 active:scale-[0.98] ${
                   isProcessing
-                    ? 'bg-slate-800 text-slate-400 cursor-not-allowed border border-[--color-border-subtle]'
+                    ? 'bg-[--color-surface-base] text-[--color-text-muted] cursor-not-allowed border border-[--color-border-subtle]'
                     : 'bg-[--color-accent-500] hover:bg-[--color-accent-400] text-slate-950 cursor-pointer'
                 }`}
                 style={{ boxShadow: isProcessing ? 'none' : 'var(--shadow-sm)' }}
               >
                 {isProcessing ? (
                   <>
-                    <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />
+                    <RefreshCw className="w-5 h-5 animate-spin text-emerald-600" />
                     <span>Processing RFID Radio Frequency Event…</span>
                   </>
                 ) : (
@@ -370,61 +406,61 @@ function AttendanceSimulatorPage() {
         {/* Right Column: Simulated RFID Hardware Device Faceplate (5 cols) */}
         <div className="lg:col-span-5 space-y-5">
           {/* Hardware Reader Unit Simulation */}
-          <div className="bg-[--color-surface-overlay] p-6 rounded-[--radius-lg] border border-[--color-border-subtle] relative overflow-hidden scanline-effect" style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.05), var(--shadow-md)' }}>
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+          <div className="bg-[--color-surface-overlay] p-6 rounded-[--radius-lg] border border-[--color-border-subtle] relative overflow-hidden scanline-effect" style={{ boxShadow: 'var(--shadow-md)' }}>
+            <div className="flex items-center justify-between border-b border-[--color-border-subtle] pb-3 mb-4">
               <div className="flex items-center gap-2">
-                <Radio className="w-4 h-4 text-emerald-400" />
-                <span className="text-xs font-mono font-bold tracking-wider text-slate-200 uppercase">
+                <Radio className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-mono font-bold tracking-wider text-[--color-text-primary] uppercase">
                   RakshaTrack RFID Reader Panel
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">
+              <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-bold">
                 13.56 MHz NFC
               </span>
             </div>
 
             {/* Card Tap Target Visual */}
-            <div className="my-4 flex flex-col items-center justify-center py-6 px-4 bg-[#070b14] rounded-2xl border-2 border-dashed border-slate-700/80 relative">
+            <div className="my-4 flex flex-col items-center justify-center py-6 px-4 bg-[--color-surface-base] rounded-2xl border-2 border-dashed border-[--color-border-mid] relative">
               {/* Antenna Glow Ring */}
               <div
                 className={`w-28 h-28 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
                   isProcessing
-                    ? 'border-emerald-400 bg-emerald-500/15 animate-ping'
-                    : 'border-slate-700 bg-slate-900/40'
+                    ? 'border-emerald-500 bg-emerald-100 animate-ping'
+                    : 'border-[--color-border-mid] bg-[--color-surface-raised]'
                 }`}
               >
-                <div className="w-20 h-20 rounded-full border border-emerald-500/40 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-full border border-emerald-500/30 flex items-center justify-center">
                   <Radio
                     className={`w-8 h-8 ${
-                      isProcessing ? 'text-emerald-400 animate-pulse' : 'text-slate-500'
+                      isProcessing ? 'text-emerald-600 animate-pulse' : 'text-[--color-text-muted]'
                     }`}
                   />
                 </div>
               </div>
 
               <div className="text-center mt-3">
-                <span className="text-xs font-mono font-bold text-slate-300 block">
+                <span className="text-xs font-mono font-bold text-[--color-text-primary] block">
                   CONTACTLESS SENSOR FIELD
                 </span>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-[--color-text-secondary]">
                   {isProcessing ? processingStep : 'Awaiting software tap trigger'}
                 </span>
               </div>
             </div>
 
             {/* Reader Diagnostics Box */}
-            <div className="bg-slate-950/80 rounded-xl p-3 border border-slate-800 font-mono text-[11px] space-y-1.5">
+            <div className="bg-[--color-surface-base] rounded-xl p-3 border border-[--color-border-mid] font-mono text-[11px] space-y-1.5">
               <div className="flex justify-between">
-                <span className="text-slate-400">Vehicle Target:</span>
-                <span className="text-slate-200">{selectedBus.busNumber} ({selectedBus.plateNumber})</span>
+                <span className="text-[--color-text-muted]">Vehicle Target:</span>
+                <span className="text-[--color-text-primary] font-semibold">{selectedBus.busNumber} ({selectedBus.plateNumber})</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Reader Telemetry:</span>
-                <span className="text-emerald-400">Lat {selectedBus.currentLat}, Lng {selectedBus.currentLng}</span>
+                <span className="text-[--color-text-muted]">Reader Telemetry:</span>
+                <span className="text-emerald-700 font-semibold">Lat {selectedBus.currentLat}, Lng {selectedBus.currentLng}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Current Occupancy:</span>
-                <span className="text-slate-200 font-bold">{selectedBus.currentOccupancy} / {selectedBus.capacity} seats</span>
+                <span className="text-[--color-text-muted]">Current Occupancy:</span>
+                <span className="text-[--color-text-primary] font-bold">{selectedBus.currentOccupancy} / {selectedBus.capacity} seats</span>
               </div>
             </div>
 
@@ -433,33 +469,33 @@ function AttendanceSimulatorPage() {
               <div
                 className={`mt-4 p-4 rounded-xl border text-xs space-y-2 animate-in fade-in slide-in-from-bottom-2 ${
                   lastResult.verification.status === 'verified'
-                    ? 'bg-emerald-950/50 border-emerald-500/50 text-emerald-200'
+                    ? 'bg-emerald-50 border-emerald-400 text-emerald-900'
                     : lastResult.verification.status === 'flagged'
-                    ? 'bg-amber-950/50 border-amber-500/50 text-amber-200'
-                    : 'bg-purple-950/50 border-purple-500/50 text-purple-200'
+                    ? 'bg-amber-50 border-amber-400 text-amber-900'
+                    : 'bg-purple-50 border-purple-400 text-purple-900'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 font-bold text-sm">
                     {lastResult.verification.status === 'verified' ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     ) : (
-                      <AlertTriangle className="w-4 h-4 text-amber-400" />
+                      <AlertTriangle className="w-4 h-4 text-amber-600" />
                     )}
                     <span className="uppercase">
                       RESULT: {lastResult.verification.status}
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/40">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/10 font-bold">
                     ID: {lastResult.tap.id}
                   </span>
                 </div>
 
-                <p className="text-[11px] leading-relaxed opacity-90">
+                <p className="text-[11px] leading-relaxed opacity-90 font-medium">
                   {lastResult.verification.explanation}
                 </p>
 
-                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px]">
+                <div className="pt-2 border-t border-black/10 flex items-center justify-between text-[10px]">
                   <span>Distance: {lastResult.verification.distanceMeters >= 0 ? `${lastResult.verification.distanceMeters}m` : 'N/A'}</span>
                   <span>Occupancy Updated: {selectedBus.currentOccupancy}/{selectedBus.capacity}</span>
                 </div>
@@ -473,14 +509,14 @@ function AttendanceSimulatorPage() {
       <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] space-y-4" style={{ boxShadow: 'var(--shadow-sm)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-emerald-400" />
-            <h3 className="text-sm font-bold text-slate-200 tracking-wide uppercase">
+            <Clock className="w-4 h-4 text-emerald-600" />
+            <h3 className="text-sm font-bold text-[--color-text-primary] tracking-wide uppercase">
               Recent Simulated Tap Log
             </h3>
           </div>
           <Link
             to="/attendance"
-            className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold"
+            className="text-xs text-emerald-600 hover:text-emerald-700 flex items-center gap-1 font-semibold"
           >
             <span>Full Attendance Audit Ledger</span>
             <ChevronRight className="w-4 h-4" />
@@ -490,7 +526,7 @@ function AttendanceSimulatorPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-800 text-slate-300 font-mono text-[11px]">
+              <tr className="border-b border-[--color-border-subtle] bg-[--color-surface-base] text-[--color-text-secondary] font-mono text-[11px]">
                 <th className="py-2.5 px-3">TAP ID</th>
                 <th className="py-2.5 px-3">STUDENT</th>
                 <th className="py-2.5 px-3">RFID CARD</th>
@@ -500,30 +536,29 @@ function AttendanceSimulatorPage() {
                 <th className="py-2.5 px-3 text-right">TIME</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-sans">
+            <tbody className="divide-y divide-[--color-border-subtle] font-sans">
               {tapEvents.slice(0, 8).map((tap) => {
                 const student = students.find((s) => s.id === tap.studentId)
                 const bus = buses.find((b) => b.id === tap.busId)
-                const verif = verifications.find((v) => v.tapEventId === tap.id)
 
                 return (
-                  <tr key={tap.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="py-2.5 px-3 font-mono text-slate-400 font-medium">{tap.id}</td>
+                  <tr key={tap.id} className="hover:bg-[--color-surface-base] transition-colors">
+                    <td className="py-2.5 px-3 font-mono text-[--color-text-muted] font-medium">{tap.id}</td>
                     <td className="py-2.5 px-3">
-                      <div className="font-semibold text-slate-200">{student?.name}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">{student?.regNumber}</div>
+                      <div className="font-semibold text-[--color-text-primary]">{student?.name}</div>
+                      <div className="text-[10px] text-[--color-text-muted] font-mono">{student?.regNumber}</div>
                     </td>
-                    <td className="py-2.5 px-3 font-mono text-emerald-400">{tap.cardUid}</td>
+                    <td className="py-2.5 px-3 font-mono text-emerald-600 font-bold">{tap.cardUid}</td>
                     <td className="py-2.5 px-3">
-                      <div className="font-medium text-slate-300">{bus?.busNumber}</div>
-                      <div className="text-[10px] text-slate-400 truncate max-w-[120px]">{tap.stopName}</div>
+                      <div className="font-medium text-[--color-text-primary]">{bus?.busNumber}</div>
+                      <div className="text-[10px] text-[--color-text-muted] truncate max-w-[120px]">{tap.stopName}</div>
                     </td>
                     <td className="py-2.5 px-3">
                       <span
                         className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                           tap.type === 'boarding'
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-slate-800 text-slate-300 border border-slate-700'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-slate-100 text-slate-700 border border-slate-200'
                         }`}
                       >
                         {tap.type}
@@ -533,16 +568,16 @@ function AttendanceSimulatorPage() {
                       <span
                         className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                           tap.verificationStatus === 'verified'
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : tap.verificationStatus === 'flagged'
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                            : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                            ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                            : 'bg-purple-50 text-purple-700 border border-purple-200'
                         }`}
                       >
                         {tap.verificationStatus}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-slate-400 text-[11px]">
+                    <td className="py-2.5 px-3 text-right font-mono text-[--color-text-muted] text-[11px]">
                       {formatRelativeTime(tap.timestamp)}
                     </td>
                   </tr>

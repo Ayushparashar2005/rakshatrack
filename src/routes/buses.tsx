@@ -44,25 +44,25 @@ function BusesManagementPage() {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="bg-[#101726] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
               Fleet Operations & Hardware
             </span>
-            <span className="text-xs text-slate-400 font-mono">Vehicle Sensor Diagnostic</span>
+            <span className="text-xs text-[--color-text-muted] font-mono">Vehicle Sensor Diagnostic</span>
           </div>
-          <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-[--color-text-primary] tracking-tight flex items-center gap-2">
             <span>Bus Fleet & Telemetry Units</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[--color-text-secondary] mt-1">
             4 commercial passenger vehicles equipped with simulated RFID gateway readers and GPS units.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-slate-300 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
-            Fleet: <b className="text-emerald-400">{buses.length} Active Vehicles</b>
+          <span className="text-xs font-mono text-[--color-text-primary] bg-[--color-surface-base] border border-[--color-border-mid] px-3 py-1.5 rounded-xl font-semibold">
+            Fleet: <b className="text-emerald-600">{buses.length} Active Vehicles</b>
           </span>
         </div>
       </div>
@@ -76,19 +76,19 @@ function BusesManagementPage() {
           return (
             <div
               key={bus.id}
-              className="bg-[#101726] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4"
+              className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm space-y-4"
             >
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-[--color-border-subtle] pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center font-bold text-emerald-400">
+                  <div className="w-10 h-10 rounded-xl bg-[--color-surface-base] border border-[--color-border-mid] flex items-center justify-center font-bold text-emerald-600">
                     <BusIcon className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-white font-mono flex items-center gap-2">
+                    <h3 className="text-base font-bold text-[--color-text-primary] font-mono flex items-center gap-2">
                       <span>{bus.busNumber}</span>
-                      <span className="text-xs font-normal text-slate-400">({bus.plateNumber})</span>
+                      <span className="text-xs font-normal text-[--color-text-muted]">({bus.plateNumber})</span>
                     </h3>
-                    <p className="text-xs text-slate-400">{bus.model}</p>
+                    <p className="text-xs text-[--color-text-secondary]">{bus.model}</p>
                   </div>
                 </div>
 
@@ -96,28 +96,28 @@ function BusesManagementPage() {
                   <span
                     className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase ${
                       bus.deviceStatus === 'online'
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-amber-50 text-amber-700 border border-amber-200'
                     }`}
                   >
                     ● {bus.deviceStatus}
                   </span>
-                  <span className="text-[10px] text-slate-500 block font-mono mt-0.5">
+                  <span className="text-[10px] text-[--color-text-muted] block font-mono mt-0.5">
                     Sensor: Heartbeat OK
                   </span>
                 </div>
               </div>
 
               {/* Live Occupancy Gauge */}
-              <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-2">
+              <div className="bg-[--color-surface-base] p-3.5 rounded-xl border border-[--color-border-subtle] space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span className="text-slate-400">Passenger Occupancy:</span>
-                  <span className="font-mono font-bold text-slate-200">
+                  <span className="text-[--color-text-secondary]">Passenger Occupancy:</span>
+                  <span className="font-mono font-bold text-[--color-text-primary]">
                     {bus.currentOccupancy} / {bus.capacity} seats ({occupancyPercent}%)
                   </span>
                 </div>
                 {/* Progress bar */}
-                <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div className="w-full h-2 rounded-full bg-[--color-border-subtle] overflow-hidden">
                   <div
                     className={`h-full transition-all duration-500 ${
                       occupancyPercent > 90
@@ -132,14 +132,14 @@ function BusesManagementPage() {
               </div>
 
               {/* Telemetry info */}
-              <div className="grid grid-cols-2 gap-2 text-xs font-mono bg-slate-900/40 p-2.5 rounded-lg border border-slate-800">
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono bg-[--color-surface-base] p-2.5 rounded-lg border border-[--color-border-subtle]">
                 <div>
-                  <span className="text-[10px] text-slate-500 block">SIMULATED VELOCITY</span>
-                  <span className="text-slate-200 font-bold">{bus.speed} km/h</span>
+                  <span className="text-[10px] text-[--color-text-muted] block">SIMULATED VELOCITY</span>
+                  <span className="text-[--color-text-primary] font-bold">{bus.speed} km/h</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 block">COORDINATES</span>
-                  <span className="text-emerald-400 text-[11px] truncate block">
+                  <span className="text-[10px] text-[--color-text-muted] block">COORDINATES</span>
+                  <span className="text-emerald-700 text-[11px] truncate block font-semibold">
                     {bus.currentLat}, {bus.currentLng}
                   </span>
                 </div>
@@ -148,29 +148,29 @@ function BusesManagementPage() {
               {/* Crew Details */}
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Assigned Route:</span>
-                  <span className="font-semibold text-slate-200">{route?.name}</span>
+                  <span className="text-[--color-text-muted]">Assigned Route:</span>
+                  <span className="font-semibold text-[--color-text-primary]">{route?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Primary Driver:</span>
-                  <span className="font-semibold text-slate-200">{bus.driverName}</span>
+                  <span className="text-[--color-text-muted]">Primary Driver:</span>
+                  <span className="font-semibold text-[--color-text-primary]">{bus.driverName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Driver Contact:</span>
-                  <span className="font-mono text-slate-300">{bus.driverPhone}</span>
+                  <span className="text-[--color-text-muted]">Driver Contact:</span>
+                  <span className="font-mono text-[--color-text-secondary]">{bus.driverPhone}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Bus Conductor:</span>
-                  <span className="text-slate-200">{bus.conductorName}</span>
+                  <span className="text-[--color-text-muted]">Bus Conductor:</span>
+                  <span className="text-[--color-text-primary]">{bus.conductorName}</span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-800 flex justify-end">
+              <div className="pt-2 border-t border-[--color-border-subtle] flex justify-end">
                 <button
                   onClick={() => openEdit(bus)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-lg bg-[--color-surface-base] hover:bg-[--color-surface-overlay] text-[--color-text-primary] border border-[--color-border-mid] text-xs font-semibold flex items-center gap-1.5 shadow-xs"
                 >
-                  <Edit className="w-3.5 h-3.5 text-emerald-400" />
+                  <Edit className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Edit Crew & Capacity</span>
                 </button>
               </div>
@@ -181,60 +181,60 @@ function BusesManagementPage() {
 
       {/* Edit Modal */}
       {editingBus && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-          <div className="bg-[#101726] border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-[--color-surface-overlay] border border-[--color-border-mid] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[--color-border-subtle] pb-3">
               <div>
-                <h3 className="text-base font-bold text-white">Edit Bus Configuration</h3>
-                <p className="text-xs text-slate-400">{editingBus.busNumber} ({editingBus.plateNumber})</p>
+                <h3 className="text-base font-bold text-[--color-text-primary]">Edit Bus Configuration</h3>
+                <p className="text-xs text-[--color-text-muted]">{editingBus.busNumber} ({editingBus.plateNumber})</p>
               </div>
-              <button onClick={() => setEditingBus(null)} className="text-slate-400 hover:text-white">
+              <button onClick={() => setEditingBus(null)} className="text-[--color-text-muted] hover:text-[--color-text-primary]">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Driver Full Name</label>
+                <label className="block text-[--color-text-secondary] font-semibold mb-1">Driver Full Name</label>
                 <input
                   type="text"
                   value={driverName}
                   onChange={(e) => setDriverName(e.target.value)}
-                  className="w-full bg-[#090d16] border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[--color-surface-base] border border-[--color-border-mid] rounded-xl px-3 py-2 text-[--color-text-primary] focus:outline-none focus:border-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Driver Phone Number</label>
+                <label className="block text-[--color-text-secondary] font-semibold mb-1">Driver Phone Number</label>
                 <input
                   type="text"
                   value={driverPhone}
                   onChange={(e) => setDriverPhone(e.target.value)}
-                  className="w-full bg-[#090d16] border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[--color-surface-base] border border-[--color-border-mid] rounded-xl px-3 py-2 text-[--color-text-primary] font-mono focus:outline-none focus:border-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Seating Capacity</label>
+                <label className="block text-[--color-text-secondary] font-semibold mb-1">Seating Capacity</label>
                 <input
                   type="number"
                   value={capacity}
                   onChange={(e) => setCapacity(Number(e.target.value))}
-                  className="w-full bg-[#090d16] border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[--color-surface-base] border border-[--color-border-mid] rounded-xl px-3 py-2 text-[--color-text-primary] font-mono focus:outline-none focus:border-emerald-500"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[--color-border-subtle]">
               <button
                 onClick={() => setEditingBus(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[--color-text-secondary] hover:text-[--color-text-primary]"
               >
                 Cancel
               </button>
               <button
                 onClick={saveBus}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md shadow-emerald-500/20"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-600/20"
               >
                 Save Vehicle
               </button>

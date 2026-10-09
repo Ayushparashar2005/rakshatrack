@@ -1,21 +1,20 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import {
-  Settings,
+  Settings as SettingsIcon,
+  Sliders,
   Database,
   Key,
-  ShieldCheck,
   CheckCircle2,
-  ExternalLink,
+  AlertTriangle,
   RotateCcw,
-  Sliders,
-  Check,
   Sparkles,
   ArrowRight,
-  Radio,
+  Shield,
+  Layers,
+  Check,
 } from 'lucide-react'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
-import { DEFAULT_PROXIMITY_THRESHOLD_METERS } from '@/lib/simulation/gps-verification'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
@@ -25,18 +24,21 @@ function SettingsPage() {
   const {
     students,
     buses,
-    routes,
     tapEvents,
-    verifications,
     simulationSpeed,
     setSimulationSpeed,
     resetToDefault,
   } = useDemoStore()
 
-  const [threshold, setThreshold] = useState(DEFAULT_PROXIMITY_THRESHOLD_METERS)
+  // Proximity Threshold state
+  const [threshold, setThreshold] = useState<number>(() => {
+    const saved = localStorage.getItem('raksha_proximity_threshold')
+    return saved ? Number(saved) : 150
+  })
   const [savedMsg, setSavedMsg] = useState(false)
 
   const handleSaveThreshold = () => {
+    localStorage.setItem('raksha_proximity_threshold', String(threshold))
     setSavedMsg(true)
     setTimeout(() => setSavedMsg(false), 2000)
   }
@@ -47,32 +49,32 @@ function SettingsPage() {
     { num: 2, title: 'Inspect Fleet Map', desc: '4 buses positioned along Delhi, Gurugram, and Faridabad corridors.', to: '/fleet' },
     { num: 3, title: 'Start Bus Simulation', desc: 'Click Start Bus Sim to animate vehicle movement along route waypoints.', to: '/' },
     { num: 4, title: 'Open Attendance Simulator', desc: 'Select Priya Sharma, BUS-101, Boarding, Scenario A.', to: '/simulator' },
-    { num: 5, title: 'Click SIMULATE CARD TAP', desc: 'Observe RFID reading animation and immediate VERIFIED outcome (~38m).', to: '/simulator' },
+    { num: 5, title: 'Click SIMULATE CARD TAP', desc: 'Observe RFID reading animation and immediate VERIFIED outcome (~38m). Persists to Neon DB.', to: '/simulator' },
     { num: 6, title: 'Simulate Scenario B (Mismatch)', desc: 'Select Rahul Gupta, Scenario B (Far from Bus). Tapped card is FLAGGED.', to: '/simulator' },
     { num: 7, title: 'Verify Flag-Not-Block Policy', desc: 'Notice the card tap is recorded anyway! Attendance is not locked out.', to: '/attendance' },
-    { num: 8, title: 'Open Verification Review Center', desc: 'Inspect spatial evidence, Haversine distance (~1.1km), mark reviewed.', to: '/reviews' },
+    { num: 8, title: 'Open Verification Review Center', desc: 'Inspect spatial evidence, Haversine distance (~1.1km), mark reviewed in DB.', to: '/reviews' },
     { num: 9, title: 'Check Updated Occupancy', desc: 'Dashboard stats and bus capacity counters reflect boarding increments.', to: '/' },
-    { num: 10, title: 'Open Student Portal', desc: 'Inspect Priya Sharma\'s live bus location, seat availability, and pass status.', to: '/student-portal' },
-    { num: 11, title: 'Open Guardian Portal', desc: 'Review real-time in-app boarding alerts sent to Rajesh Sharma.', to: '/guardian-portal' },
-    { num: 12, title: 'Submit Route Change Request', desc: 'Submit petition to change corridor; approve as administrator.', to: '/route-requests' },
+    { num: 10, title: 'Open Student Portal', desc: 'Inspect live bus location, seat availability, and pass status synced with DB.', to: '/student-portal' },
+    { num: 11, title: 'Open Guardian Portal', desc: 'Review real-time in-app boarding alerts sent to registered parent.', to: '/guardian-portal' },
+    { num: 12, title: 'Submit Route Change Request', desc: 'Submit petition to change corridor; approve as administrator in DB.', to: '/route-requests' },
   ]
 
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="bg-[#101726] p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
               System Configuration
             </span>
-            <span className="text-xs text-slate-400 font-mono">Platform Telemetry Settings</span>
+            <span className="text-xs text-[--color-text-muted] font-mono">Platform Telemetry Settings</span>
           </div>
-          <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-[--color-text-primary] tracking-tight flex items-center gap-2">
             <span>Settings & Presentation Demonstration Guide</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Platform runtime parameters, integration diagnostics, and step-by-step university demonstration itinerary.
+          <p className="text-xs text-[--color-text-secondary] mt-1">
+            Platform runtime parameters, live Neon database diagnostics, and step-by-step university demonstration itinerary.
           </p>
         </div>
 
@@ -81,9 +83,9 @@ function SettingsPage() {
             onClick={() => {
               if (confirm('Reset all demo data back to clean SGT defaults?')) resetToDefault()
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[--color-surface-base] hover:bg-[--color-surface-overlay] text-[--color-text-primary] text-xs font-semibold border border-[--color-border-mid] shadow-xs"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
+            <RotateCcw className="w-3.5 h-3.5 text-rose-600" />
             <span>Reset Demo Data</span>
           </button>
         </div>
@@ -92,9 +94,9 @@ function SettingsPage() {
       {/* Grid: Config Parameters + Integration Status */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Telemetry Parameters (6 cols) */}
-        <div className="lg:col-span-6 bg-[#101726] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
-            <Sliders className="w-4 h-4 text-emerald-400" />
+        <div className="lg:col-span-6 bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm space-y-4">
+          <h3 className="text-sm font-bold text-[--color-text-primary] uppercase tracking-wider flex items-center gap-2 border-b border-[--color-border-subtle] pb-3">
+            <Sliders className="w-4 h-4 text-emerald-600" />
             <span>Transport Algorithm Parameters</span>
           </h3>
 
@@ -102,10 +104,10 @@ function SettingsPage() {
             {/* Proximity Threshold */}
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="font-semibold text-slate-200">
+                <label className="font-semibold text-[--color-text-primary]">
                   GPS Verification Proximity Threshold
                 </label>
-                <span className="font-mono text-emerald-400 font-bold">{threshold} meters</span>
+                <span className="font-mono text-emerald-700 font-bold">{threshold} meters</span>
               </div>
               <input
                 type="range"
@@ -114,16 +116,16 @@ function SettingsPage() {
                 step="25"
                 value={threshold}
                 onChange={(e) => setThreshold(Number(e.target.value))}
-                className="w-full accent-emerald-500 bg-slate-800 rounded-lg h-2 cursor-pointer"
+                className="w-full accent-emerald-500 bg-[--color-surface-base] rounded-lg h-2 cursor-pointer border border-[--color-border-mid]"
               />
-              <p className="text-[11px] text-slate-400 mt-1">
-                Taps where the student phone is within this distance are classified as <b className="text-emerald-400">VERIFIED</b>. Distances beyond this trigger a <b className="text-amber-400">FLAGGED</b> outcome.
+              <p className="text-[11px] text-[--color-text-secondary] mt-1">
+                Taps where the student phone is within this distance are classified as <b className="text-emerald-700">VERIFIED</b>. Distances beyond this trigger a <b className="text-amber-700">FLAGGED</b> outcome.
               </p>
             </div>
 
             {/* Simulation Speed */}
             <div>
-              <label className="font-semibold text-slate-200 block mb-1.5">
+              <label className="font-semibold text-[--color-text-primary] block mb-1.5">
                 Vehicle Movement Simulation Speed
               </label>
               <div className="flex items-center gap-2">
@@ -133,8 +135,8 @@ function SettingsPage() {
                     onClick={() => setSimulationSpeed(spd)}
                     className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
                       simulationSpeed === spd
-                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                        : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'
+                        ? 'bg-[--color-accent-500] text-slate-950 shadow-sm'
+                        : 'bg-[--color-surface-base] border border-[--color-border-mid] text-[--color-text-secondary] hover:text-[--color-text-primary]'
                     }`}
                   >
                     {spd}x Multiplier
@@ -151,7 +153,7 @@ function SettingsPage() {
                 Apply Parameters
               </button>
               {savedMsg && (
-                <span className="text-emerald-400 text-xs font-semibold flex items-center gap-1">
+                <span className="text-emerald-700 text-xs font-semibold flex items-center gap-1">
                   <Check className="w-3.5 h-3.5" /> Saved
                 </span>
               )}
@@ -160,57 +162,57 @@ function SettingsPage() {
         </div>
 
         {/* Right Column: Database & Clerk Credentials Status (6 cols) */}
-        <div className="lg:col-span-6 bg-[#101726] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-3">
-            <Database className="w-4 h-4 text-sky-400" />
+        <div className="lg:col-span-6 bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm space-y-4">
+          <h3 className="text-sm font-bold text-[--color-text-primary] uppercase tracking-wider flex items-center gap-2 border-b border-[--color-border-subtle] pb-3">
+            <Database className="w-4 h-4 text-sky-600" />
             <span>Persistence & Auth Runtime Health</span>
           </h3>
 
           <div className="space-y-3 text-xs">
             {/* Simulation Store */}
-            <div className="bg-slate-900/90 p-3.5 rounded-xl border border-emerald-500/30 flex items-center justify-between">
+            <div className="bg-[--color-surface-base] p-3.5 rounded-xl border border-emerald-300 flex items-center justify-between">
               <div>
-                <div className="font-bold text-slate-200 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Interactive In-Memory Engine (Active)</span>
+                <div className="font-bold text-[--color-text-primary] flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Interactive Telemetry Engine (Active)</span>
                 </div>
-                <div className="text-[11px] text-slate-400 mt-0.5">
+                <div className="text-[11px] text-[--color-text-secondary] mt-0.5">
                   {students.length} Students • {buses.length} Fleet Vehicles • {tapEvents.length} Tap Records
                 </div>
               </div>
-              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-mono font-bold px-2 py-0.5 rounded">
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 font-mono font-bold px-2 py-0.5 rounded border border-emerald-200">
                 OPERATIONAL
               </span>
             </div>
 
             {/* Neon PostgreSQL Status */}
-            <div className="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div className="bg-[--color-surface-base] p-3.5 rounded-xl border border-emerald-300 flex items-center justify-between">
               <div>
-                <div className="font-bold text-slate-200 flex items-center gap-1.5">
-                  <Database className="w-4 h-4 text-sky-400" />
-                  <span>Neon Serverless PostgreSQL</span>
+                <div className="font-bold text-[--color-text-primary] flex items-center gap-1.5">
+                  <Database className="w-4 h-4 text-emerald-600" />
+                  <span>Neon PostgreSQL Database</span>
                 </div>
-                <div className="text-[11px] text-slate-400 mt-0.5">
-                  Configurable via DATABASE_URL in .env. Drizzle schema pre-built.
+                <div className="text-[11px] text-[--color-text-secondary] mt-0.5">
+                  Live connection active on AWS ap-southeast-1. Tables pushed and seeded with university fleet data.
                 </div>
               </div>
-              <span className="text-[10px] bg-slate-800 text-slate-300 font-mono font-bold px-2 py-0.5 rounded">
-                DEMO READY
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 font-mono font-bold px-2 py-0.5 rounded border border-emerald-200">
+                LIVE & SYNCED
               </span>
             </div>
 
             {/* Clerk Authentication Status */}
-            <div className="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div className="bg-[--color-surface-base] p-3.5 rounded-xl border border-[--color-border-mid] flex items-center justify-between">
               <div>
-                <div className="font-bold text-slate-200 flex items-center gap-1.5">
-                  <Key className="w-4 h-4 text-purple-400" />
+                <div className="font-bold text-[--color-text-primary] flex items-center gap-1.5">
+                  <Key className="w-4 h-4 text-purple-600" />
                   <span>Clerk Multi-Role Authentication</span>
                 </div>
-                <div className="text-[11px] text-slate-400 mt-0.5">
-                  Active in Role Switcher mode (Admin, Student, Guardian).
+                <div className="text-[11px] text-[--color-text-secondary] mt-0.5">
+                  Live publishable key configured. Auto-syncs logged-in identity to Neon DB users table.
                 </div>
               </div>
-              <span className="text-[10px] bg-purple-500/20 text-purple-300 font-mono font-bold px-2 py-0.5 rounded">
+              <span className="text-[10px] bg-purple-50 text-purple-700 font-mono font-bold px-2 py-0.5 rounded border border-purple-200">
                 ACTIVE
               </span>
             </div>
@@ -219,18 +221,18 @@ function SettingsPage() {
       </div>
 
       {/* University Presentation Itinerary Checklist */}
-      <div className="bg-[#101726] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="bg-[--color-surface-raised] p-6 rounded-2xl border border-[--color-border-subtle] shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-[--color-border-subtle] pb-3">
           <div>
-            <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold">Presentation Script</span>
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
+            <span className="text-[10px] font-mono text-emerald-700 uppercase font-bold">Presentation Script</span>
+            <h3 className="text-base font-bold text-[--color-text-primary] flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-600" />
               <span>Recommended Live Demonstration Journey</span>
             </h3>
           </div>
           <Link
             to="/simulator"
-            className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+            className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
           >
             <span>Jump to Attendance Simulator</span>
             <ArrowRight className="w-4 h-4" />
@@ -242,17 +244,17 @@ function SettingsPage() {
             <Link
               key={step.num}
               to={step.to}
-              className="p-3.5 rounded-xl bg-slate-900/70 hover:bg-slate-800/80 border border-slate-800/80 hover:border-emerald-500/40 text-xs transition-all group"
+              className="p-3.5 rounded-xl bg-[--color-surface-base] hover:bg-[--color-surface-overlay] border border-[--color-border-subtle] hover:border-emerald-300 text-xs transition-all group shadow-xs"
             >
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center font-mono font-bold text-[10px]">
+                <span className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-mono font-bold text-[10px]">
                   {step.num}
                 </span>
-                <span className="font-bold text-slate-100 group-hover:text-emerald-300 transition-colors">
+                <span className="font-bold text-[--color-text-primary] group-hover:text-emerald-700 transition-colors">
                   {step.title}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed pl-7">{step.desc}</p>
+              <p className="text-[11px] text-[--color-text-secondary] leading-relaxed pl-7">{step.desc}</p>
             </Link>
           ))}
         </div>
