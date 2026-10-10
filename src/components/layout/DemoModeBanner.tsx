@@ -21,18 +21,7 @@ export const DemoModeBanner: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-slate-950 border-b border-emerald-500/20 px-4 py-2 text-xs text-slate-200">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Left: Indicator */}
-        <div className="flex items-center gap-2.5">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-          </span>
-          <div className="flex items-center gap-1.5 font-semibold tracking-wide text-emerald-400">
-            <Shield className="w-3.5 h-3.5" />
-            <span>DEMO SIMULATION MODE</span>
-          </div>
-        </div>
+      <div className="flex flex-wrap items-center justify-end gap-3">
 
         {/* Right: Simulation Controls */}
         <div className="flex items-center gap-2">
