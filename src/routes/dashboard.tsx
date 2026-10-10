@@ -234,6 +234,7 @@ function DashboardPage() {
             height="460px"
             selectedBusId={selectedBusId}
             onSelectBus={(id) => setSelectedBusId(id)}
+            showControls={false}
           />
 
           {/* Quick Route Highlights */}

@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import type { Bus, Route, RouteStop } from '@/lib/types'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
 import { Play, Pause, RotateCcw, Navigation, Layers, ShieldCheck, MapPin, Gauge } from 'lucide-react'
+import { gsap } from 'gsap'
+import { VerificationOverlay } from '@/components/map/VerificationOverlay'
 
 interface FleetMapProps {
   selectedBusId?: string | null
@@ -21,7 +23,7 @@ export const FleetMap: React.FC<FleetMapProps> = ({
   const busMarkersRef = useRef<Record<string, any>>({})
   const routePolylinesRef = useRef<any[]>([])
 
-  const { buses, routes, isSimulationRunning, toggleSimulation, resetToDefault } = useDemoStore()
+  const { buses, routes, isSimulationRunning, toggleSimulation, resetToDefault, simulationSpeed } = useDemoStore()
   const [mapReady, setMapReady] = useState(false)
   const [activeLayer, setActiveLayer] = useState<'all' | 'route-a' | 'route-b' | 'route-c'>('all')
 
@@ -67,6 +69,7 @@ export const FleetMap: React.FC<FleetMapProps> = ({
           weight: 4,
           opacity: 0.85,
           dashArray: '8, 8',
+          className: 'animated-route-path'
         }).addTo(map)
 
         routePolylinesRef.current.push(polyline)
@@ -198,13 +201,33 @@ export const FleetMap: React.FC<FleetMapProps> = ({
               background: #020617;
               border: 1px solid rgba(255,255,255,0.15);
               border-radius: 9999px;
-              padding: 1px 5px;
-              font-size: 8px;
-              color: #94a3b8;
-              font-family: monospace;
-              white-space: nowrap;
+              width: 50px;
+              height: 12px;
+              position: relative;
+              overflow: hidden;
             ">
-              ${bus.currentOccupancy}/${bus.capacity} seats
+              <div style="
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: ${(bus.currentOccupancy / bus.capacity) * 100}%;
+                background: ${routeColor};
+                transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+              "></div>
+              <div style="
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 8px;
+                color: #fff;
+                font-family: monospace;
+                font-weight: bold;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+                z-index: 2;
+              ">${bus.currentOccupancy}/${bus.capacity}</div>
             </div>
           </div>
         `
@@ -217,9 +240,23 @@ export const FleetMap: React.FC<FleetMapProps> = ({
         })
 
         if (busMarkersRef.current[bus.id]) {
-          // Smoothly update existing marker position
-          busMarkersRef.current[bus.id].setLatLng([bus.currentLat, bus.currentLng])
-          busMarkersRef.current[bus.id].setIcon(customIcon)
+          const marker = busMarkersRef.current[bus.id]
+          const currentPos = marker.getLatLng()
+          
+          // Smooth GSAP interpolation (Phase 2A)
+          const intervalSec = Math.max(0.8, (2.4 / simulationSpeed))
+          
+          gsap.to(currentPos, {
+            lat: bus.currentLat,
+            lng: bus.currentLng,
+            duration: intervalSec,
+            ease: 'linear',
+            onUpdate: () => {
+              marker.setLatLng([currentPos.lat, currentPos.lng])
+            }
+          })
+          
+          marker.setIcon(customIcon)
         } else {
           // Create new marker
           const marker = L.marker([bus.currentLat, bus.currentLng], { icon: customIcon }).addTo(map)
@@ -318,6 +355,9 @@ export const FleetMap: React.FC<FleetMapProps> = ({
 
       {/* Map DOM Element */}
       <div ref={mapContainerRef} style={{ height, width: '100%' }} className="z-0" />
+      {mapReady && mapInstanceRef.current && (
+        <VerificationOverlay map={mapInstanceRef.current} />
+      )}
 
       {/* Bottom Floating Bus Cards Selector */}
       {showControls && (

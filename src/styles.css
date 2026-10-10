@@ -492,3 +492,11 @@
   box-shadow: var(--nm-raised);
 }
 
+/* ─── PHASE 2C: ANIMATED ROUTE TRAIL ──────────────────────────── */
+@keyframes dash-trail {
+  to { stroke-dashoffset: -100; }
+}
+.animated-route-path {
+  animation: dash-trail 4s linear infinite;
+}
+
