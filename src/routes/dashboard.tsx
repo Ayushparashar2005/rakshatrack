@@ -21,6 +21,8 @@ import {
 } from 'lucide-react'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
 import { FleetMap } from '@/components/map/FleetMap'
+import { motion } from 'framer-motion'
+import { AnimatedKpiCard } from '@/components/dashboard/AnimatedKpiCard'
 import {
   BarChart,
   Bar,
@@ -123,92 +125,57 @@ function DashboardPage() {
       </div>
 
       {/* 8 Primary Live KPI Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3">
-        {/* Total Students */}
-        <div className="stat-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-[--color-text-secondary] uppercase tracking-widest">Students</span>
-            <Users className="w-4 h-4 text-[--color-text-muted]" />
-          </div>
-          <div className="text-3xl font-bold text-[--color-text-primary] tabular-nums tracking-tight">{totalStudents}</div>
-          <div className="text-xs text-[--color-text-secondary] mt-1">Registered & Active</div>
-        </div>
-
-        {/* Total Buses */}
-        <div className="stat-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-[--color-text-secondary] uppercase tracking-widest">Fleet Buses</span>
-            <BusIcon className="w-4 h-4 text-[--color-text-muted]" />
-          </div>
-          <div className="text-3xl font-bold text-[--color-text-primary] tabular-nums tracking-tight">{totalBuses}</div>
-          <div className="text-xs text-[--color-text-secondary] mt-1">3 City Routes</div>
-        </div>
-
-        {/* Active Trips */}
-        <div className="stat-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-[--color-text-secondary] uppercase tracking-widest">Active Trips</span>
-            <Navigation className="w-4 h-4 text-[--color-accent-500]" />
-          </div>
-          <div className="text-3xl font-bold text-[--color-accent-500] tabular-nums tracking-tight">{activeTrips}</div>
-          <div className="text-xs text-[--color-text-secondary] mt-1">Morning Shifts</div>
-        </div>
-
-        {/* Students Onboard */}
-        <div className="stat-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-[--color-text-secondary] uppercase tracking-widest">Onboard</span>
-            <UserCheck className="w-4 h-4 text-[--color-accent-500]" />
-          </div>
-          <div className="text-3xl font-bold text-[--color-text-primary] tabular-nums tracking-tight">{totalStudentsOnboard}</div>
-          <div className="text-xs text-[--color-accent-500] mt-1">In transit now</div>
-        </div>
-
-        {/* Available Seats */}
-        <div className="stat-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-[--color-text-secondary] uppercase tracking-widest">Seats Avail</span>
-            <TrendingUp className="w-4 h-4 text-[--color-text-muted]" />
-          </div>
-          <div className="text-3xl font-bold text-[--color-text-primary] tabular-nums tracking-tight">{availableSeats}</div>
-          <div className="text-xs text-[--color-text-secondary] mt-1">Total Cap: {totalCapacity}</div>
-        </div>
-
-        {/* Today's Boardings */}
-        <div className="stat-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-[--color-text-secondary] uppercase tracking-widest">Boardings</span>
-            <UserCheck className="w-4 h-4 text-[--color-accent-500]" />
-          </div>
-          <div className="text-3xl font-bold text-[--color-accent-500] tabular-nums tracking-tight">{todayBoardings}</div>
-          <div className="text-xs text-[--color-text-secondary] mt-1">Today's Taps</div>
-        </div>
-
-        {/* Today's Alightings */}
-        <div className="stat-card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-[--color-text-secondary] uppercase tracking-widest">Alightings</span>
-            <UserMinus className="w-4 h-4 text-[--color-text-muted]" />
-          </div>
-          <div className="text-3xl font-bold text-[--color-text-primary] tabular-nums tracking-tight">{todayAlightings}</div>
-          <div className="text-xs text-[--color-text-secondary] mt-1">Exited Vehicle</div>
-        </div>
-
-        {/* Pending Verification Alerts */}
-        <Link
-          to="/reviews"
-          className="stat-card p-4 hover:bg-[--color-surface-overlay] border-amber-500/30 group block transition-colors"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-amber-500 uppercase tracking-widest">GPS Flags</span>
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-          </div>
-          <div className="text-3xl font-bold text-amber-500 tabular-nums tracking-tight">
-            {pendingVerificationAlerts}
-          </div>
-          <div className="text-xs text-amber-500/80 mt-1 underline">Review Cases →</div>
+      <motion.div 
+        className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {
+            transition: {
+              staggerChildren: 0.06
+            }
+          }
+        }}
+      >
+        <AnimatedKpiCard 
+          index={0} title="Students" value={totalStudents} subtitle="Registered & Active" 
+          icon={<Users className="w-4 h-4 text-[--color-text-muted]" />} 
+        />
+        <AnimatedKpiCard 
+          index={1} title="Fleet Buses" value={totalBuses} subtitle="3 City Routes" 
+          icon={<BusIcon className="w-4 h-4 text-[--color-text-muted]" />} 
+        />
+        <AnimatedKpiCard 
+          index={2} title="Active Trips" value={activeTrips} subtitle="Morning Shifts" 
+          icon={<Navigation className="w-4 h-4 text-[--color-accent-500]" />} 
+        />
+        <AnimatedKpiCard 
+          index={3} title="Onboard" value={totalStudentsOnboard} subtitle="In transit now" 
+          icon={<UserCheck className="w-4 h-4 text-[--color-accent-500]" />} 
+        />
+        <AnimatedKpiCard 
+          index={4} title="Seats Avail" value={availableSeats} subtitle={`Total Cap: ${totalCapacity}`} 
+          icon={<TrendingUp className="w-4 h-4 text-[--color-text-muted]" />} 
+        />
+        <AnimatedKpiCard 
+          index={5} title="Boardings" value={todayBoardings} subtitle="Today's Taps" 
+          icon={<UserCheck className="w-4 h-4 text-[--color-accent-500]" />} 
+        />
+        <AnimatedKpiCard 
+          index={6} title="Alightings" value={todayAlightings} subtitle="Exited Vehicle" 
+          icon={<UserMinus className="w-4 h-4 text-[--color-text-muted]" />} 
+        />
+        
+        {/* Pending Verification Alerts - Wrapped in Link */}
+        <Link to="/reviews" className="block h-full outline-none">
+          <AnimatedKpiCard 
+            index={7} title="GPS Flags" value={pendingVerificationAlerts} subtitle="Review Cases →" 
+            icon={<AlertTriangle className="w-4 h-4 text-amber-500" />} 
+            isAlert={true}
+          />
         </Link>
-      </div>
+      </motion.div>
 
       {/* Main Grid: Interactive Map + Occupancy by Bus */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
