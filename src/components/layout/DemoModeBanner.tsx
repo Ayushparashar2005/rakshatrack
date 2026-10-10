@@ -32,9 +32,6 @@ export const DemoModeBanner: React.FC = () => {
             <Shield className="w-3.5 h-3.5" />
             <span>DEMO SIMULATION MODE</span>
           </div>
-          <span className="hidden sm:inline-block text-slate-400 border-l border-slate-700 pl-2">
-            Software-only prototype • No physical RFID/GPS hardware required • University Presentation Ready
-          </span>
         </div>
 
         {/* Right: Simulation Controls */}
