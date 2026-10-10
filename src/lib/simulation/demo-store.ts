@@ -10,6 +10,7 @@ import type {
   UserRole,
   VerificationEvidence,
 } from '../types'
+import { playNotificationPing } from '../sound'
 import {
   SEED_ALERTS,
   SEED_BUSES,
@@ -270,6 +271,9 @@ class DemoStore {
     // Alighting decreases occupancy (floor at 0)
     let newOccupancy = bus.currentOccupancy
     if (params.type === 'boarding') {
+      // Notification Sound on Boarding
+      playNotificationPing()
+      
       newOccupancy = Math.min(bus.capacity + 5, bus.currentOccupancy + 1)
       if (newOccupancy > bus.capacity) {
         // Raise Capacity Alert

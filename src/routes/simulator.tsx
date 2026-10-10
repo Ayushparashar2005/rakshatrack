@@ -23,6 +23,7 @@ import { StepTimeline } from '@/components/simulator/StepTimeline'
 import { NfcScanAnimation } from '@/components/simulator/NfcScanAnimation'
 import { ResultPanel } from '@/components/simulator/ResultPanel'
 import { motion } from 'framer-motion'
+import { playRfidTapSound, playVerifiedSound, playFlaggedSound } from '@/lib/sound'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
 import type { EventType, VerificationEvidence, TapEvent } from '@/lib/types'
 import { formatRelativeTime } from '@/lib/utils'
@@ -67,6 +68,9 @@ function AttendanceSimulatorPage() {
     if (isProcessing) return
     setIsProcessing(true)
     setLastResult(null)
+    
+    // Sound: RFID tap
+    playRfidTapSound()
 
     // Step 1: RFID Antenna Reading
     setCurrentStepIndex(0)
@@ -133,6 +137,14 @@ function AttendanceSimulatorPage() {
           },
         }).catch((err) => console.warn('Verification Neon DB persistence notice:', err))
       }
+      
+      // Sound on result
+      if (outcome.tapEvent.verificationStatus === 'verified') {
+        playVerifiedSound()
+      } else if (outcome.tapEvent.verificationStatus === 'flagged') {
+        playFlaggedSound()
+      }
+      
     } catch (err: any) {
       alert(`Simulation Error: ${err.message}`)
     } finally {

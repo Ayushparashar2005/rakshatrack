@@ -14,8 +14,10 @@ import {
   Shield,
   Layers,
   Check,
+  Volume2,
 } from 'lucide-react'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
+import { useSoundEnabled } from '@/hooks/useSoundEnabled'
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
@@ -37,6 +39,7 @@ function SettingsPage() {
     return saved ? Number(saved) : 150
   })
   const [savedMsg, setSavedMsg] = useState(false)
+  const { soundEnabled, toggleSound } = useSoundEnabled()
 
   const handleSaveThreshold = () => {
     localStorage.setItem('raksha_proximity_threshold', String(threshold))
@@ -151,6 +154,29 @@ function SettingsPage() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Sound Effects Toggle */}
+            <div>
+              <label className="font-semibold text-[--color-text-primary] flex items-center gap-2 mb-1.5">
+                <Volume2 className="w-4 h-4 text-emerald-600" />
+                UI Sound Effects
+              </label>
+              <button
+                onClick={() => toggleSound(!soundEnabled)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  soundEnabled ? 'bg-emerald-500' : 'bg-slate-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    soundEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+              <p className="text-[11px] text-[--color-text-secondary] mt-1">
+                Enable synthesized micro-interaction sounds (RFID taps, validation chimes). 
+              </p>
             </div>
 
             <div className="pt-2 flex items-center gap-3">
