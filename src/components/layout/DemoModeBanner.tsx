@@ -70,7 +70,7 @@ export const DemoModeBanner: React.FC = () => {
                 onClick={() => setSimulationSpeed(speed)}
                 className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-colors ${
                   simulationSpeed === speed
-                    ? 'bg-emerald-500 text-slate-950 font-bold'
+                    ? 'bg-emerald-500 text-white font-bold'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -86,7 +86,7 @@ export const DemoModeBanner: React.FC = () => {
             <select
               value={currentRole}
               onChange={(e) => setRole(e.target.value as UserRole)}
-              className="bg-transparent text-emerald-300 text-xs font-medium focus:outline-none cursor-pointer"
+              className="bg-slate-900 text-emerald-300 text-xs font-medium focus:outline-none cursor-pointer"
             >
               <option value="admin" className="bg-slate-900 text-white">Administrator</option>
               <option value="student" className="bg-slate-900 text-white">Student (Priya S.)</option>

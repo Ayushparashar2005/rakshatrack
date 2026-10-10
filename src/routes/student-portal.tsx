@@ -74,7 +74,7 @@ function StudentPortalPage() {
     <RoleGuard allowedRoles={['admin', 'student']}>
       <div className="space-y-6 pb-12">
       {/* Student Profile Switcher Header */}
-      <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-0.5 shadow-md shadow-emerald-500/20">
             <div className="w-full h-full bg-[--color-surface-overlay] rounded-[14px] flex items-center justify-center font-bold text-emerald-600 text-lg">
@@ -86,7 +86,7 @@ function StudentPortalPage() {
           </div>
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-bold uppercase">
+              <span className="section-tag">
                 Student Transport Pass
               </span>
               <span className="text-xs text-[--color-text-muted] font-mono">AY 2026-27</span>

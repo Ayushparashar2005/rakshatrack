@@ -70,10 +70,10 @@ function BusesManagementPage() {
     <RoleGuard allowedRoles={['admin']}>
       <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="section-tag">
               Fleet Operations & Hardware
             </span>
             <span className="text-xs text-[--color-text-muted] font-mono">Vehicle Sensor Diagnostic</span>

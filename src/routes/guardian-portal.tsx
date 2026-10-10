@@ -77,10 +77,10 @@ function GuardianPortalPage() {
     <RoleGuard allowedRoles={['admin', 'guardian']}>
       <div className="space-y-6 pb-12">
       {/* Header & Ward Selector */}
-      <div className="bg-[--color-surface-raised] p-5 rounded-2xl border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="section-tag">
               Guardian Child Safety Portal
             </span>
             <span className="text-xs text-[--color-text-muted] font-mono">In-App Live Telemetry</span>
@@ -255,7 +255,7 @@ function GuardianPortalPage() {
               </div>
             </div>
 
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] text-emerald-800">
+            <div className="p-3 hero-banner-success rounded-xl text-[11px] text-[--color-text-primary]">
               Campus Transport Helpdesk Hotline: <b>+91 (0124) 2278-183</b>
             </div>
           </div>

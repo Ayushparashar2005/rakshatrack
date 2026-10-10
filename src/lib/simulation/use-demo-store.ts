@@ -22,6 +22,7 @@ export function useDemoStore() {
     stepBuses: () => demoStore.stepBuses(),
     setSimulationSpeed: (speed: number) => demoStore.setSimulationSpeed(speed),
     setRole: (role: Parameters<typeof demoStore.setRole>[0]) => demoStore.setRole(role),
+    completeOnboarding: (role: Parameters<typeof demoStore.completeOnboarding>[0]) => demoStore.completeOnboarding(role),
     setActiveStudent: (studentId: string) => demoStore.setActiveStudent(studentId),
     updateStudent: (studentId: string, patch: any) => demoStore.updateStudent(studentId, patch),
     updateBus: (busId: string, patch: any) => demoStore.updateBus(busId, patch),

@@ -40,7 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
       title: 'CORE PLATFORM',
       roles: ['admin', 'student', 'guardian'],
       items: [
-        { name: 'Dashboard',     to: '/',      icon: LayoutDashboard, badge: null, roles: ['admin', 'student', 'guardian'] },
+        { name: 'Dashboard',     to: '/dashboard',      icon: LayoutDashboard, badge: null, roles: ['admin', 'student', 'guardian'] },
         { name: 'Fleet Tracking',to: '/fleet', icon: MapPin,           badge: 'Live', badgeColor: 'emerald', roles: ['admin'] },
       ],
     },
@@ -100,20 +100,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
 
   return (
     <aside
-      className="w-64 h-full flex flex-col flex-shrink-0 select-none border-r"
+      className="w-64 h-full flex flex-col flex-shrink-0 select-none z-10"
       style={{
         background: 'var(--color-sidebar)',
-        borderColor: 'var(--color-border-subtle)',
+        boxShadow: 'inset -1px 0 0 var(--color-border-subtle)',
       }}
     >
       {/* Brand Header — glass pill */}
-      <div
-        className="p-4 border-b"
-        style={{
-          borderColor: 'var(--color-border-subtle)',
-          background: 'linear-gradient(145deg, oklch(1 0 0 / 0.60), oklch(1 0 0 / 0.30))',
-        }}
-      >
+      <div className="p-4 border-b border-[--color-border-subtle] glass-panel !rounded-none !border-x-0 !border-t-0 !shadow-none">
         <div className="flex items-center gap-3">
           {/* Logo mark — neumorphic circle */}
           <div
@@ -146,8 +140,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
         {navSections.map((section) => (
           <div key={section.title} className="space-y-0.5">
             <div
-              className="px-3 pb-2 text-[10px] font-bold tracking-widest uppercase"
-              style={{ color: 'var(--color-text-ghost)' }}
+              className="px-3 pb-2 text-[10px] font-bold tracking-[0.12em] uppercase"
+              style={{ color: 'var(--color-text-muted)' }}
             >
               {section.title}
             </div>
@@ -159,27 +153,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                   key={item.to}
                   to={item.to}
                   onClick={onCloseMobile}
-                  className="group flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-150"
-                  style={isActive ? {
-                    background: 'var(--color-surface-raised)',
-                    boxShadow: 'var(--nm-inset)',
-                    color: 'var(--color-accent-500)',
-                    fontWeight: 600,
-                  } : {
-                    color: 'var(--color-text-secondary)',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.background = 'oklch(1 0 0 / 0.55)'
-                      ;(e.currentTarget as HTMLElement).style.boxShadow = 'var(--nm-flat)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.background = ''
-                      ;(e.currentTarget as HTMLElement).style.boxShadow = ''
-                    }
-                  }}
+                  className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] transition-all duration-150 ${
+                    isActive
+                      ? 'nm-inset border-l-[3px] border-l-[--color-accent-500] text-[--color-accent-500] font-semibold bg-[--color-surface-raised]'
+                      : 'text-[--color-text-secondary] font-medium hover:bg-[--color-surface-sunken] hover:shadow-[var(--nm-flat)]'
+                  }`}
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Icon
@@ -202,15 +180,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
         ))}
       </div>
 
-      {/* Bottom status — glass card */}
-      <div
-        className="p-3 border-t"
-        style={{ borderColor: 'var(--color-border-subtle)', background: 'oklch(1 0 0 / 0.35)' }}
-      >
-        <div
-          className="rounded-xl p-3 text-[11px] space-y-2"
-          style={{ boxShadow: 'var(--nm-inset)', background: 'var(--color-surface-sunken)', border: '1px solid var(--color-border-subtle)' }}
-        >
+      {/* Bottom status */}
+      <div className="p-3 border-t border-[--color-border-subtle]">
+        <div className="nm-inset rounded-xl p-3 text-[11px] space-y-2">
           <div className="flex items-center justify-between">
             <span style={{ color: 'var(--color-text-muted)' }}>Policy:</span>
             <span className="font-semibold flex items-center gap-1" style={{ color: 'var(--color-accent-600)' }}>

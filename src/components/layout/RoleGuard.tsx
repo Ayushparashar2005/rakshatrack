@@ -1,8 +1,8 @@
 import React from 'react'
-import { useUser } from '@clerk/clerk-react'
+import { useUser } from '@clerk/tanstack-react-start'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
 import { ShieldAlert, Loader2 } from 'lucide-react'
-import { Redirect } from '@tanstack/react-router'
+import { Navigate } from '@tanstack/react-router'
 
 type AllowedRoles = 'admin' | 'student' | 'guardian'
 
@@ -25,7 +25,7 @@ export function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
   }
 
   if (!isSignedIn) {
-    return <Redirect to="/sign-in" />
+    return <Navigate to="/sign-in" />
   }
 
   if (allowedRoles && !allowedRoles.includes(currentRole as AllowedRoles)) {

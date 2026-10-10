@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as AttendanceRouteImport } from './routes/attendance'
 import { Route as BusesRouteImport } from './routes/buses'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as FleetRouteImport } from './routes/fleet'
 import { Route as GuardianPortalRouteImport } from './routes/guardian-portal'
 import { Route as ReviewsRouteImport } from './routes/reviews'
@@ -43,6 +44,11 @@ const AttendanceRoute = AttendanceRouteImport.update({
 const BusesRoute = BusesRouteImport.update({
   id: '/buses',
   path: '/buses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FleetRoute = FleetRouteImport.update({
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/alerts': typeof AlertsRoute
   '/attendance': typeof AttendanceRoute
   '/buses': typeof BusesRoute
+  '/dashboard': typeof DashboardRoute
   '/fleet': typeof FleetRoute
   '/guardian-portal': typeof GuardianPortalRoute
   '/reviews': typeof ReviewsRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/alerts': typeof AlertsRoute
   '/attendance': typeof AttendanceRoute
   '/buses': typeof BusesRoute
+  '/dashboard': typeof DashboardRoute
   '/fleet': typeof FleetRoute
   '/guardian-portal': typeof GuardianPortalRoute
   '/reviews': typeof ReviewsRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/alerts': typeof AlertsRoute
   '/attendance': typeof AttendanceRoute
   '/buses': typeof BusesRoute
+  '/dashboard': typeof DashboardRoute
   '/fleet': typeof FleetRoute
   '/guardian-portal': typeof GuardianPortalRoute
   '/reviews': typeof ReviewsRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/attendance'
     | '/buses'
+    | '/dashboard'
     | '/fleet'
     | '/guardian-portal'
     | '/reviews'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/attendance'
     | '/buses'
+    | '/dashboard'
     | '/fleet'
     | '/guardian-portal'
     | '/reviews'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/alerts'
     | '/attendance'
     | '/buses'
+    | '/dashboard'
     | '/fleet'
     | '/guardian-portal'
     | '/reviews'
@@ -212,6 +224,7 @@ export interface RootRouteChildren {
   AlertsRoute: typeof AlertsRoute
   AttendanceRoute: typeof AttendanceRoute
   BusesRoute: typeof BusesRoute
+  DashboardRoute: typeof DashboardRoute
   FleetRoute: typeof FleetRoute
   GuardianPortalRoute: typeof GuardianPortalRoute
   ReviewsRoute: typeof ReviewsRoute
@@ -253,6 +266,13 @@ declare module '@tanstack/react-router' {
       path: '/buses'
       fullPath: '/buses'
       preLoaderRoute: typeof BusesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fleet': {
@@ -340,6 +360,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlertsRoute: AlertsRoute,
   AttendanceRoute: AttendanceRoute,
   BusesRoute: BusesRoute,
+  DashboardRoute: DashboardRoute,
   FleetRoute: FleetRoute,
   GuardianPortalRoute: GuardianPortalRoute,
   ReviewsRoute: ReviewsRoute,

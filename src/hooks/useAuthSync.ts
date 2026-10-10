@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useUser } from '@clerk/clerk-react'
+import { useUser } from '@clerk/tanstack-react-start'
 import { syncUserOnSignIn } from '@/lib/auth'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
 

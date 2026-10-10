@@ -77,10 +77,10 @@ function VerificationReviewCenterPage() {
     <RoleGuard allowedRoles={['admin']}>
       <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="bg-[--color-surface-raised] p-5 rounded-[--radius-lg] border border-[--color-border-subtle] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4" style={{ boxShadow: 'var(--shadow-sm)', borderLeft: '3px solid var(--color-flagged)' }}>
+      <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4" style={{ borderLeft: "4px solid var(--color-flagged)" }}>
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="section-tag">
               Administrative Safety Audit Queue
             </span>
             <span className="text-xs text-[--color-text-muted] font-mono">Campus Security Operations</span>

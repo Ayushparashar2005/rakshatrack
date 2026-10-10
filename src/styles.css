@@ -32,6 +32,7 @@
   --color-text-primary:   oklch(0.20 0.010 250);
   --color-text-secondary: oklch(0.36 0.008 250);
   --color-text-muted:     oklch(0.54 0.007 250);
+  --color-text-ghost-elevated: oklch(0.58 0.007 250);
   --color-text-ghost:     oklch(0.70 0.005 250);
 
   /* ── Borders ─────────────────────────────────────────────────── */
@@ -90,6 +91,19 @@
   --z-modal:    200;
   --z-tooltip:  300;
   --z-toast:    400;
+  /* ── New Glassmorphic and Section Tokens ───────────────────────── */
+  --glass-header: linear-gradient(to right, oklch(1 0 0 / 0.60), oklch(1 0 0 / 0.50));
+
+  --color-section-tag-bg:    oklch(0.63 0.188 155 / 0.10);
+  --color-section-tag-text:  oklch(0.43 0.188 155);
+  --color-section-tag-border: oklch(0.63 0.188 155 / 0.22);
+
+  --color-success-surface: oklch(0.96 0.030 155);
+  --color-success-border:  oklch(0.72 0.168 155 / 0.40);
+  --color-warning-surface: oklch(0.97 0.025 70);
+  --color-warning-border:  oklch(0.72 0.18 55 / 0.40);
+  --color-danger-surface:  oklch(0.97 0.020 20);
+  --color-danger-border:   oklch(0.60 0.21 25 / 0.40);
 }
 
 /* ─── GLOBAL BASE ─────────────────────────────────────────────── */
@@ -126,6 +140,12 @@
       transition-duration: 0.01ms !important;
     }
   }
+}
+
+/* ─── TYPOGRAPHY ──────────────────────────────────────────────── */
+.stat-card .label,
+.page-header .label {
+  color: var(--color-text-secondary);
 }
 
 /* ─── SCROLLBAR ───────────────────────────────────────────────── */
@@ -209,7 +229,7 @@
 /* ─── NEUMORPHIC BUTTON ───────────────────────────────────────── */
 .nm-btn {
   box-shadow: var(--nm-raised);
-  border: 1px solid oklch(1 0 0 / 0.72);
+  border: 1px solid transparent;
   transition:
     box-shadow 180ms var(--ease-out-quart),
     transform  100ms var(--ease-spring);
@@ -218,6 +238,27 @@
 .nm-btn:active {
   box-shadow: var(--nm-inset);
   transform: scale(0.97);
+}
+
+.nm-btn-surface {
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-primary);
+  border-color: oklch(1 0 0 / 0.72);
+}
+
+.nm-btn-accent {
+  background-color: var(--color-accent-500);
+  color: white;
+  border-color: oklch(0.55 0.175 155 / 0.35);
+  box-shadow:
+    3px 3px 10px oklch(0.63 0.188 155 / 0.28),
+    -2px -2px 6px oklch(1 0 0 / 0.40);
+}
+.nm-btn-accent:hover {
+  background-color: var(--color-accent-600);
+  box-shadow:
+    5px 5px 16px oklch(0.63 0.188 155 / 0.35),
+    -3px -3px 8px oklch(1 0 0 / 0.50);
 }
 
 /* ─── STAT CARD ───────────────────────────────────────────────── */
@@ -255,7 +296,7 @@
     box-shadow 180ms var(--ease-out-quart),
     border-color 180ms;
 }
-.nm-input::placeholder { color: var(--color-text-ghost); }
+.nm-input::placeholder { color: var(--color-text-ghost-elevated); }
 .nm-input:focus {
   outline: none;
   box-shadow:
@@ -368,4 +409,86 @@
 }
 .leaflet-popup-tip { background: oklch(1 0 0 / 0.82) !important; }
 .leaflet-popup-content { margin: 0 !important; line-height: 1.5 !important; }
+
+/* ─── NEW NEUMORPHIC & GLASSMORPHIC UTILITIES ───────────────── */
+
+/* ─── PAGE HEADER CARD */
+.page-header {
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--nm-raised);
+  border: 1px solid oklch(1 0 0 / 0.72);
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.page-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, oklch(1 0 0 / 0.35) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ─── SECTION TAG */
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.6875rem;   /* 11px */
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  background: var(--color-section-tag-bg);
+  color: var(--color-section-tag-text);
+  border: 1px solid var(--color-section-tag-border);
+}
+.section-tag.amber {
+  background: oklch(0.72 0.18 55 / 0.10);
+  color: oklch(0.42 0.18 55);
+  border-color: oklch(0.72 0.18 55 / 0.25);
+}
+.section-tag.violet {
+  background: oklch(0.65 0.17 290 / 0.10);
+  color: oklch(0.40 0.17 290);
+  border-color: oklch(0.65 0.17 290 / 0.25);
+}
+.section-tag.teal {
+  background: oklch(0.65 0.17 195 / 0.10);
+  color: oklch(0.40 0.17 195);
+  border-color: oklch(0.65 0.17 195 / 0.25);
+}
+
+/* ─── GLASS PANEL */
+.glass-panel {
+  background: oklch(1 0 0 / 0.68);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: var(--radius-lg);
+  border: 1px solid oklch(1 0 0 / 0.65);
+  box-shadow: var(--glass-shadow-lg);
+}
+
+/* ─── STATUS HERO BANNER */
+.hero-banner-success {
+  background: linear-gradient(135deg, var(--color-success-surface), oklch(0.93 0.040 155));
+  border: 1px solid var(--color-success-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 20px oklch(0.63 0.188 155 / 0.12);
+}
+.hero-banner-warning {
+  background: linear-gradient(135deg, var(--color-warning-surface), oklch(0.94 0.030 70));
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 20px oklch(0.72 0.18 55 / 0.10);
+}
+.hero-banner-neutral {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--nm-raised);
+}
 

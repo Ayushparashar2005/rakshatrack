@@ -37,6 +37,7 @@ interface DemoState {
     event: TapEvent
     verification: VerificationEvidence
   } | null
+  hasSelectedRole: boolean
 }
 
 const STORAGE_KEY = 'rakshatrack_demo_store_v1'
@@ -71,6 +72,7 @@ function getInitialState(): DemoState {
     currentRole: 'admin',
     activeStudentId: 'student-1',
     lastProcessedTap: null,
+    hasSelectedRole: false,
   }
 }
 
@@ -112,6 +114,12 @@ class DemoStore {
 
   public setRole(role: UserRole) {
     this.state.currentRole = role
+    this.notify()
+  }
+
+  public completeOnboarding(role: UserRole) {
+    this.state.currentRole = role
+    this.state.hasSelectedRole = true
     this.notify()
   }
 
@@ -464,6 +472,7 @@ class DemoStore {
       currentRole: 'admin',
       activeStudentId: 'student-1',
       lastProcessedTap: null,
+      hasSelectedRole: false,
     }
     this.busStepIndices = {
       'bus-101': 3,

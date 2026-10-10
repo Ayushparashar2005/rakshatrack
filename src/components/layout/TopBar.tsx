@@ -90,12 +90,11 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobileMenu }) => {
 
   return (
     <header
-      className="h-14 px-4 flex items-center justify-between gap-4 flex-shrink-0 border-b"
+      className="h-14 px-4 flex items-center justify-between gap-4 flex-shrink-0 border-b border-[--color-border-subtle] z-10"
       style={{
-        background: 'linear-gradient(to right, oklch(1 0 0 / 0.55), oklch(1 0 0 / 0.45))',
+        background: 'var(--glass-header)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderColor: 'var(--color-border-subtle)',
         boxShadow: '0 1px 0 oklch(1 0 0 / 0.60)',
       }}
     >
@@ -103,8 +102,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobileMenu }) => {
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleMobileMenu}
-          className="lg:hidden p-2 rounded-xl transition-all"
-          style={{ color: 'var(--color-text-muted)', boxShadow: 'var(--nm-raised)', background: 'var(--color-surface-raised)', border: '1px solid oklch(1 0 0 / 0.70)' }}
+          className="lg:hidden p-2 rounded-xl nm-btn nm-btn-surface bg-[--color-surface-raised] text-[--color-text-secondary] hover:text-[--color-text-primary]"
         >
           <Menu className="w-4 h-4" />
         </button>
@@ -129,29 +127,13 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobileMenu }) => {
       {/* Right: Live stats & Quick Actions */}
       <div className="flex items-center gap-2">
         {/* Live Clock */}
-        <div
-          className="hidden sm:flex items-center gap-1.5 text-xs font-mono px-2.5 py-1.5 rounded-xl"
-          style={{
-            boxShadow: 'var(--nm-inset)',
-            background: 'var(--color-surface-sunken)',
-            border: '1px solid var(--color-border-subtle)',
-            color: 'var(--color-text-secondary)',
-          }}
-        >
+        <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono px-2.5 py-1.5 rounded-xl nm-inset text-[--color-text-secondary]">
           <Clock className="w-3.5 h-3.5" style={{ color: 'var(--color-accent-500)' }} />
           <span>{timeStr || '—'}</span>
         </div>
 
         {/* Bus Telemetry Status */}
-        <div
-          className="hidden md:flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-xl"
-          style={{
-            boxShadow: 'var(--nm-inset)',
-            background: 'var(--color-surface-sunken)',
-            border: '1px solid var(--color-border-subtle)',
-            color: 'var(--color-text-secondary)',
-          }}
-        >
+        <div className="hidden md:flex items-center gap-1.5 text-[11px] px-2.5 py-1.5 rounded-xl nm-inset text-[--color-text-secondary]">
           <Activity
             className={`w-3.5 h-3.5 ${isSimulationRunning ? 'animate-spin' : ''}`}
             style={{ color: isSimulationRunning ? 'var(--color-accent-500)' : 'var(--color-text-muted)' }}
@@ -162,15 +144,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobileMenu }) => {
         {/* Quick Simulator CTA */}
         <Link
           to="/simulator"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 active:scale-[0.97]"
-          style={{
-            background: 'var(--color-accent-500)',
-            color: 'white',
-            boxShadow: '3px 3px 8px oklch(0.63 0.188 155 / 0.30), -1px -1px 4px oklch(1 0 0 / 0.50)',
-            border: '1px solid oklch(0.63 0.188 155 / 0.35)',
-          }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-600)' }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--color-accent-500)' }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 nm-btn nm-btn-accent bg-[--color-accent-500] text-white hover:bg-[--color-accent-600]"
         >
           <Radio className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Simulate Tap</span>
@@ -180,11 +154,8 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobileMenu }) => {
         {/* Alerts Bell */}
         <Link
           to="/alerts"
-          className="relative p-2 rounded-xl transition-all"
-          style={{ color: 'var(--color-text-muted)', boxShadow: 'var(--nm-raised)', background: 'var(--color-surface-raised)', border: '1px solid oklch(1 0 0 / 0.70)' }}
+          className="relative p-2 rounded-xl nm-btn nm-btn-surface bg-[--color-surface-raised] text-[--color-text-secondary] hover:text-[--color-text-primary]"
           title="System Alerts"
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--nm-raised-lg)' }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--nm-raised)' }}
         >
           <Bell className="w-4 h-4" />
           {unreadAlerts > 0 && (
@@ -201,37 +172,49 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobileMenu }) => {
         <div className="flex items-center gap-2 pl-2 border-l" style={{ borderColor: 'var(--color-border-subtle)' }}>
           <Show when="signed-out">
             <SignInButton mode="modal">
-              <button
-                className="px-3 py-1.5 text-xs font-semibold rounded-xl transition-all"
-                style={{ color: 'var(--color-text-primary)', boxShadow: 'var(--nm-raised)', background: 'var(--color-surface-raised)', border: '1px solid oklch(1 0 0 / 0.70)' }}
-              >
+              <button className="px-3 py-1.5 text-xs font-semibold rounded-xl nm-btn nm-btn-surface bg-[--color-surface-raised] text-[--color-text-primary]">
                 Sign In
               </button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <button
-                className="px-3 py-1.5 text-xs font-bold rounded-xl text-white transition-all"
-                style={{ background: 'var(--color-accent-500)', boxShadow: '3px 3px 8px oklch(0.63 0.188 155 / 0.25)' }}
-              >
+              <button className="px-3 py-1.5 text-xs font-bold rounded-xl nm-btn nm-btn-accent bg-[--color-accent-500] text-white hover:bg-[--color-accent-600]">
                 Sign Up
               </button>
             </SignUpButton>
           </Show>
           <Show when="signed-in">
             <div className="flex items-center gap-2">
-              <span
-                className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full font-mono"
-                style={
-                  currentRole === 'admin'
-                    ? { background: 'oklch(0.72 0.18 55 / 0.12)', color: 'oklch(0.52 0.18 55)', border: '1px solid oklch(0.72 0.18 55 / 0.25)' }
-                    : currentRole === 'guardian'
-                    ? { background: 'oklch(0.65 0.17 290 / 0.12)', color: 'oklch(0.45 0.17 290)', border: '1px solid oklch(0.65 0.17 290 / 0.25)' }
-                    : { background: 'oklch(0.63 0.188 155 / 0.10)', color: 'oklch(0.43 0.188 155)', border: '1px solid oklch(0.63 0.188 155 / 0.22)' }
-                }
-                title={`Logged in role: ${currentRole}`}
-              >
-                {currentRole}
-              </span>
+              <div className="nm-inset rounded-full p-0.5">
+                <select
+                  value={currentRole}
+                  onChange={async (e) => {
+                    const newRole = e.target.value as 'admin' | 'student' | 'guardian';
+                    setRole(newRole);
+                    if (user) {
+                      try {
+                        await user.update({ unsafeMetadata: { ...user.unsafeMetadata, role: newRole } });
+                        // Re-sync with Neon DB
+                        await syncUserOnSignIn({ ...user, unsafeMetadata: { ...user.unsafeMetadata, role: newRole } });
+                      } catch (err) {
+                        console.error('Failed to update role in Clerk:', err);
+                      }
+                    }
+                  }}
+                  className="text-[10px] font-bold uppercase tracking-wider pl-3 pr-6 py-0.5 rounded-full font-mono outline-none cursor-pointer text-center bg-transparent"
+                  style={
+                    currentRole === 'admin'
+                      ? { color: 'oklch(0.52 0.18 55)' }
+                      : currentRole === 'guardian'
+                      ? { color: 'oklch(0.45 0.17 290)' }
+                      : { color: 'oklch(0.43 0.188 155)' }
+                  }
+                  title="Switch your role"
+                >
+                  <option value="student">STUDENT</option>
+                  <option value="guardian">GUARDIAN</option>
+                  <option value="admin">ADMIN</option>
+                </select>
+              </div>
               <UserButton />
             </div>
           </Show>

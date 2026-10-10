@@ -19,6 +19,10 @@ import {
   ChevronRight,
   Info,
 } from 'lucide-react'
+import { StepTimeline } from '@/components/simulator/StepTimeline'
+import { NfcScanAnimation } from '@/components/simulator/NfcScanAnimation'
+import { ResultPanel } from '@/components/simulator/ResultPanel'
+import { motion } from 'framer-motion'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
 import type { EventType, VerificationEvidence, TapEvent } from '@/lib/types'
 import { formatRelativeTime } from '@/lib/utils'
@@ -47,7 +51,7 @@ function AttendanceSimulatorPage() {
 
   // Processing animation states
   const [isProcessing, setIsProcessing] = useState(false)
-  const [processingStep, setProcessingStep] = useState<string>('')
+  const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1)
   const [lastResult, setLastResult] = useState<{
     tap: TapEvent
     verification: VerificationEvidence
@@ -65,19 +69,19 @@ function AttendanceSimulatorPage() {
     setLastResult(null)
 
     // Step 1: RFID Antenna Reading
-    setProcessingStep('1/4: Scanning RFID Antenna & Reading Card UID…')
+    setCurrentStepIndex(0)
     await new Promise((r) => setTimeout(r, 450))
 
     // Step 2: University Registry Validation
-    setProcessingStep('2/4: Validating Transport Enrollment & Pass Eligibility…')
+    setCurrentStepIndex(1)
     await new Promise((r) => setTimeout(r, 500))
 
     // Step 3: Mobile GPS Cross-Verification
-    setProcessingStep('3/4: Querying Companion Mobile GPS & Calculating Distance…')
+    setCurrentStepIndex(2)
     await new Promise((r) => setTimeout(r, 550))
 
     // Step 4: Ledger Recording & Occupancy Update
-    setProcessingStep('4/4: Committing Event to Transit Audit Ledger & Neon DB…')
+    setCurrentStepIndex(3)
     await new Promise((r) => setTimeout(r, 400))
 
     try {
@@ -132,8 +136,11 @@ function AttendanceSimulatorPage() {
     } catch (err: any) {
       alert(`Simulation Error: ${err.message}`)
     } finally {
-      setIsProcessing(false)
-      setProcessingStep('')
+      setCurrentStepIndex(4)
+      setTimeout(() => {
+        setIsProcessing(false)
+        setCurrentStepIndex(-1)
+      }, 600)
     }
   }
 
@@ -142,11 +149,11 @@ function AttendanceSimulatorPage() {
     <RoleGuard allowedRoles={['admin']}>
       <div className="space-y-6 pb-12">
       {/* Page Header */}
-      <div className="nm-card p-6 border-l-4 border-l-[--color-accent-500]">
+      <div className="page-header border-l-4 border-l-[--color-accent-500]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
+              <span className="section-tag">
                 Hardware-Free Simulation Console
               </span>
               <span className="text-xs text-[--color-text-muted] font-mono">ISO 14443-A Emulation</span>
@@ -377,6 +384,13 @@ function AttendanceSimulatorPage() {
               </div>
             </div>
 
+            {/* Processing Progress Stepper */}
+            {currentStepIndex >= 0 && (
+              <div className="py-2 mb-2">
+                <StepTimeline currentStepIndex={currentStepIndex} />
+              </div>
+            )}
+
             {/* Giant SIMULATE CARD TAP Button */}
             <div className="pt-2">
               <button
@@ -385,8 +399,8 @@ function AttendanceSimulatorPage() {
                 disabled={isProcessing}
                 className={`nm-btn w-full py-4 px-6 rounded-xl font-black text-sm tracking-widest uppercase flex items-center justify-center gap-3 ${
                   isProcessing
-                    ? 'bg-[--color-surface-base] text-[--color-text-muted] cursor-not-allowed'
-                    : 'bg-[--color-accent-500] text-slate-950 cursor-pointer'
+                    ? 'nm-btn-surface bg-[--color-surface-base] text-[--color-text-muted] cursor-not-allowed'
+                    : 'nm-btn-accent bg-[--color-accent-500] text-white cursor-pointer'
                 }`}
               >
                 {isProcessing ? (
@@ -396,7 +410,7 @@ function AttendanceSimulatorPage() {
                   </>
                 ) : (
                   <>
-                    <Zap className="w-5 h-5 text-slate-950 fill-slate-950" />
+                    <Zap className="w-5 h-5 text-white fill-white" />
                     <span>SIMULATE CARD TAP</span>
                   </>
                 )}
@@ -416,36 +430,23 @@ function AttendanceSimulatorPage() {
                   RakshaTrack RFID Reader Panel
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-bold">
+              <span className="section-tag">
                 13.56 MHz NFC
               </span>
             </div>
 
             {/* Card Tap Target Visual */}
-            <div className="my-4 flex flex-col items-center justify-center py-6 px-4 bg-[--color-surface-base] rounded-2xl border-2 border-dashed border-[--color-border-mid] relative">
-              {/* Antenna Glow Ring */}
-              <div
-                className={`w-28 h-28 rounded-full border-2 flex items-center justify-center transition-colors duration-300 ${
-                  isProcessing
-                    ? 'border-emerald-500 bg-emerald-100 animate-ping'
-                    : 'border-[--color-border-mid] bg-[--color-surface-raised]'
-                }`}
-              >
-                <div className="w-20 h-20 rounded-full border border-emerald-500/30 flex items-center justify-center">
-                  <Radio
-                    className={`w-8 h-8 ${
-                      isProcessing ? 'text-emerald-600 animate-pulse' : 'text-[--color-text-muted]'
-                    }`}
-                  />
-                </div>
-              </div>
+            <div className="my-4 flex flex-col items-center justify-center py-6 px-4 bg-[--color-surface-base] rounded-2xl border-2 border-dashed border-[--color-border-mid] relative overflow-hidden">
+              <NfcScanAnimation 
+                status={isProcessing ? 'scanning' : lastResult ? (lastResult.verification?.status === 'verified' ? 'verified' : 'flagged') : 'idle'} 
+              />
 
-              <div className="text-center mt-3">
-                <span className="text-xs font-mono font-bold text-[--color-text-primary] block">
+              <div className="text-center mt-6">
+                <span className="text-xs font-mono font-bold text-[--color-text-primary] block z-10 relative">
                   CONTACTLESS SENSOR FIELD
                 </span>
-                <span className="text-[10px] text-[--color-text-secondary]">
-                  {isProcessing ? processingStep : 'Awaiting software tap trigger'}
+                <span className="text-[10px] text-[--color-text-secondary] z-10 relative">
+                  {isProcessing ? 'Processing RFID Signal...' : 'Awaiting software tap trigger'}
                 </span>
               </div>
             </div>
@@ -468,40 +469,11 @@ function AttendanceSimulatorPage() {
 
             {/* Live Tap Result Banner */}
             {lastResult && (
-              <div
-                className={`mt-4 p-4 rounded-xl border text-xs space-y-2 animate-in fade-in slide-in-from-bottom-2 ${
-                  lastResult.verification.status === 'verified'
-                    ? 'bg-emerald-50 border-emerald-400 text-emerald-900'
-                    : lastResult.verification.status === 'flagged'
-                    ? 'bg-amber-50 border-amber-400 text-amber-900'
-                    : 'bg-purple-50 border-purple-400 text-purple-900'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 font-bold text-sm">
-                    {lastResult.verification.status === 'verified' ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-amber-600" />
-                    )}
-                    <span className="uppercase">
-                      RESULT: {lastResult.verification.status}
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/10 font-bold">
-                    ID: {lastResult.tap.id}
-                  </span>
-                </div>
-
-                <p className="text-[11px] leading-relaxed opacity-90 font-medium">
-                  {lastResult.verification.explanation}
-                </p>
-
-                <div className="pt-2 border-t border-black/10 flex items-center justify-between text-[10px]">
-                  <span>Distance: {lastResult.verification.distanceMeters >= 0 ? `${lastResult.verification.distanceMeters}m` : 'N/A'}</span>
-                  <span>Occupancy Updated: {selectedBus.currentOccupancy}/{selectedBus.capacity}</span>
-                </div>
-              </div>
+              <ResultPanel 
+                tap={lastResult.tap} 
+                verification={lastResult.verification} 
+                message={lastResult.message} 
+              />
             )}
           </div>
         </div>

@@ -41,10 +41,10 @@ function FleetTrackingPage() {
     <RoleGuard allowedRoles={['admin']}>
       <div className="space-y-6 pb-12">
       {/* Header & Controls Bar */}
-      <div className="nm-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="page-header flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono">
+            <span className="section-tag">
               GPS Telemetry Feed
             </span>
             <span className="text-xs text-[--color-text-muted] font-mono">Simulated Coordinates</span>
@@ -63,8 +63,8 @@ function FleetTrackingPage() {
             onClick={() => toggleSimulation()}
             className={`nm-btn flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-150 ${
               isSimulationRunning
-                ? 'bg-[--color-accent-600] text-white'
-                : 'bg-[--color-surface-base] text-[--color-text-primary]'
+                ? 'nm-btn-accent bg-[--color-accent-600] text-white'
+                : 'nm-btn-surface bg-[--color-surface-base] text-[--color-text-primary]'
             }`}
           >
             {isSimulationRunning ? (
@@ -98,7 +98,7 @@ function FleetTrackingPage() {
 
           <button
             onClick={() => resetToDefault()}
-            className="nm-btn p-2.5 rounded-xl bg-[--color-surface-base] text-[--color-text-muted] hover:text-[--color-danger] transition-colors"
+            className="nm-btn nm-btn-surface p-2.5 rounded-xl bg-[--color-surface-base] text-[--color-text-muted] hover:text-[--color-danger] transition-colors"
             title="Reset Simulation Positions"
           >
             <RotateCcw className="w-4 h-4" />

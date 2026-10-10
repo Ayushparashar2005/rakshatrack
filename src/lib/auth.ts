@@ -4,8 +4,8 @@ import type { UserRole } from './types'
 export function getRoleFromUser(user: any): UserRole {
   if (!user) return 'student'
 
-  // 1. Check Clerk publicMetadata
-  const metaRole = user.publicMetadata?.role as string | undefined
+  // 1. Check Clerk publicMetadata or unsafeMetadata
+  const metaRole = (user.publicMetadata?.role || user.unsafeMetadata?.role) as string | undefined
   if (metaRole === 'admin' || metaRole === 'guardian' || metaRole === 'student') {
     return metaRole
   }
