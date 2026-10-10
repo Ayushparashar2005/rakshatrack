@@ -16,8 +16,10 @@ import {
   User,
   Bus as BusIcon,
   Download,
+  Calendar,
 } from 'lucide-react'
 import { useDemoStore } from '@/lib/simulation/use-demo-store'
+import { AttendanceHeatmap } from '@/components/charts/AttendanceHeatmap'
 import type { TapEvent, VerificationEvidence, VerificationStatus, EventType } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
 import { useThreshold } from '@/hooks/useThreshold'
@@ -37,6 +39,27 @@ function AttendanceHistoryPage() {
 
   // Selected row for detail drawer
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
+
+  // Generate last 90 days mock data for heatmap
+  const heatmapData = React.useMemo(() => {
+    const data = []
+    const now = new Date()
+    for (let i = 89; i >= 0; i--) {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i)
+      data.push({
+        date: d.toISOString().split('T')[0],
+        count: Math.floor(Math.random() * 10) // random taps
+      })
+    }
+    // Add real events for today
+    const todayStr = now.toISOString().split('T')[0]
+    const todayItem = data.find(d => d.date === todayStr)
+    if (todayItem) {
+      todayItem.count = tapEvents.length
+    }
+    return data
+  }, [tapEvents.length])
 
   // Filtered tap events
   const filteredEvents = tapEvents.filter((tap) => {
@@ -119,6 +142,36 @@ function AttendanceHistoryPage() {
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
           </button>
+        </div>
+      </div>
+
+      {/* D3 Heatmap Component */}
+      <div className="glass-card p-5 border border-[--color-border-subtle]">
+        <div className="flex items-center gap-2 mb-4">
+          <Calendar className="w-4 h-4 text-emerald-600" />
+          <h3 className="text-sm font-bold text-[--color-text-primary] tracking-wide uppercase">
+            Network Tap Activity (Last 90 Days)
+          </h3>
+        </div>
+        <div className="overflow-x-auto pb-2">
+          <div className="min-w-[600px]">
+            <AttendanceHeatmap data={heatmapData} />
+          </div>
+        </div>
+      </div>
+
+      {/* D3 Heatmap Component */}
+      <div className="glass-card p-5 border border-[--color-border-subtle]">
+        <div className="flex items-center gap-2 mb-4">
+          <Calendar className="w-4 h-4 text-emerald-600" />
+          <h3 className="text-sm font-bold text-[--color-text-primary] tracking-wide uppercase">
+            Network Tap Activity (Last 90 Days)
+          </h3>
+        </div>
+        <div className="overflow-x-auto pb-2">
+          <div className="min-w-[600px]">
+            <AttendanceHeatmap data={heatmapData} />
+          </div>
         </div>
       </div>
 

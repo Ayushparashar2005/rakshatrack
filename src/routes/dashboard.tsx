@@ -253,7 +253,7 @@ function DashboardPage() {
                     contentStyle={{ background: 'var(--color-surface-float)', borderColor: 'var(--color-border-subtle)', borderRadius: 8, fontSize: 12, color: 'var(--color-text-primary)' }}
                     formatter={(val: any, name: any) => [`${val} seats`, name === 'occupancy' ? 'Occupied' : 'Available']}
                   />
-                  <Bar dataKey="occupancy" radius={[0, 4, 4, 0]}>
+                  <Bar dataKey="occupancy" radius={[0, 4, 4, 0]} isAnimationActive animationDuration={600} animationEasing="ease-out">
                     {occupancyChartData.map((entry, index) => (
                       <Cell
                          key={`cell-${index}`}
@@ -314,7 +314,7 @@ function DashboardPage() {
                   <Tooltip
                     contentStyle={{ background: 'var(--color-surface-float)', borderColor: 'var(--color-border-subtle)', borderRadius: 8, fontSize: 12, color: 'var(--color-text-primary)' }}
                   />
-                  <Area type="monotone" dataKey="boardings" stroke="var(--color-accent-500)" fillOpacity={1} fill="oklch(0.65 0.195 155 / 0.12)" />
+                  <Area type="monotone" dataKey="boardings" stroke="var(--color-accent-500)" fillOpacity={1} fill="oklch(0.65 0.195 155 / 0.12)" isAnimationActive animationDuration={800} animationEasing="ease-out" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
